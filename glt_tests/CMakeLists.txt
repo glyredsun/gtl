@@ -7,3 +7,6 @@ include_directories(stack_test ${gtl_dir})
 
 add_executable(vector_test vector_test.cpp)
 include_directories(vector_test ${gtl_dir})
+
+add_executable(list_test list_test.cpp)
+include_directories(list_test ${gtl_dir})
