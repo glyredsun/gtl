@@ -1,3 +1,10 @@
+#ifdef _MSC_VER
+#pragma once
+#endif // _MSC_VER
+
+#ifndef _VECTOR_HPP_
+#define _VECTOR_HPP_
+
 #include <macros.hpp>
 #include <algorithm>
 
@@ -68,6 +75,18 @@ public:
 		return _datas[idx];
 	}
 
+	bool empty() {
+		return _size == 0;
+	}
+
+	size_t size() {
+		return _size;
+	}
+
+	size_t capacity() {
+		return _capacity;
+	}
+
 	void resize(size_t newSize) {
 		if (newSize > _capacity) {
 			reserve(newSize * 2);
@@ -106,8 +125,8 @@ public:
 	class iterator
 	{
 	public:
-		iterator(vector &v, size_t idx)
-			: vectPtr(&v), idx(idx)
+		iterator(vector *v, int idx)
+			: vectPtr(v), idx(idx)
 		{
 
 		}
@@ -125,6 +144,19 @@ public:
 			return *this;
 		}
 
+		iterator operator --(int)
+		{
+			iterator copy = *this;
+			--idx;
+			return copy;
+		}
+
+		iterator& operator --()
+		{
+			--idx;
+			return *this;
+		}
+
 		iterator& operator =(const iterator& other)
 		{
 			if (&other !== this)
@@ -135,14 +167,14 @@ public:
 			return *this;
 		}
 
-		T& operator ->()
+		T* operator ->()
 		{
-			return (*vectPtr)[idx];
+			return &(*vectPtr)[idx];
 		}
 
-		const T& operator ->() const
+		const T* operator ->() const
 		{
-			return (*vectPtr)[idx];
+			return &(*vectPtr)[idx];
 		}
 
 		T& operator*()
@@ -164,21 +196,67 @@ public:
 			return !(*this == other);
 		}
 
-	private:
+	protected:
 		vector *vectPtr;
-		size_t idx;
+		int idx;
+	};
+
+	class reverse_iterator : public iterator
+	{
+	public:
+		reverse_iterator(vector *vectPtr, int idx)
+			: iterator(vectPtr, idx)
+		{
+
+		}
+
+		reverse_iterator operator ++(int)
+		{
+			reverse_iterator copy = *this;
+			--idx;
+			return copy;
+		}
+
+		reverse_iterator& operator ++()
+		{
+			--idx;
+			return *this;
+		}
+
+		reverse_iterator operator --(int)
+		{
+			reverse_iterator copy = *this;
+			++idx;
+			return copy;
+		}
+
+		reverse_iterator& operator --()
+		{
+			++idx;
+			return *this;
+		}
 	};
 
 public:
 
 	iterator begin()
 	{
-		return iterator(*this, 0);
+		return iterator(this, 0);
 	}
 
 	iterator end()
 	{
-		return iterator(*this, _size);
+		return iterator(this, _size);
+	}
+
+	reverse_iterator rbegin()
+	{
+		return reverse_iterator(this, _size - 1);
+	}
+
+	reverse_iterator rend()
+	{
+		return reverse_iterator(this, -1);
 	}
 
 private:
@@ -189,3 +267,4 @@ private:
 };
 
 NS_END(gtl)
+#endif // !_VECTOR_HPP_

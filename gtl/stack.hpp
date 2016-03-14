@@ -1,4 +1,12 @@
+#ifdef _MSC_VER
+#pragma once
+#endif // _MSC_VER
+
+#ifndef _STACK_HPP_
+#define _STACK_HPP_
+
 #include <macros.hpp>
+#include <vector.hpp>
 
 NS_BEGIN(gtl)
 
@@ -7,44 +15,44 @@ class stack
 {
 public:
 
-	stack(int capacity)
-		: _capacity(capacity)
+	stack(int capacity = 0)
+		: _container(capacity)
 	{
-		if (_capacity > 0) {
-			_datas = new T[_capacity];
-		}
 	}
-
-	
 
 	~stack()
 	{
-		if (_data) {
-			delete[] _datas;
-		}
 	}
 
+	void push(const T &elem) {
+		T copy = elem;
+		push(std::move(copy));
+	}
 
-
-	void push(const T &data) {
-		++_size;
-		if (_size > _capacity) {
-
-		}
+	void push(T &&elem) {
+		_container.push_back(elem);
 	}
 
 	T& top() {
-		return _data[_size];
+		return _container[_container.size() - 1];
 	}
 
 	const T& top() const {
-		return _datas[_size];
+		return top();
+	}
+
+	void pop() {
+		_container.resize(_container.size() - 1);
+	}
+
+	bool empty() {
+		return _container.empty();
 	}
 
 private:
-	int _capacity;
-	int _size;
-	T* _datas;
+	vector<T> _container;
 };
 
 NS_END(gtl)
+
+#endif // ! _STACK_HPP_

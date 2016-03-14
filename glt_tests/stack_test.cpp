@@ -1,12 +1,18 @@
 #include <stack.hpp>
 
-#include <stack>
-
-#include <algorithm>
+#include <iostream>
 
 int main(void)
 {
-	std::stack<int> s1, s2;
-	std::swap(s1, s2);
+	gtl::stack<int> is;
+	is.push(1);
+	is.push(2);
+	is.push(3);
+
+	while (!is.empty()) {
+		std::cout << is.top() << std::endl;
+		is.pop();
+	}
+
 	return 0;
 }
