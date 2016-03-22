@@ -97,6 +97,101 @@ private:
 			printf("%s %p\n", __FUNCTION__, this);
 		}
 	};
+
+public:
+
+	class iterator
+	{
+	public:
+		iterator(Node *n) :n(n) {}
+		iterator(const iterator& other) : iterator(other.n) {}
+
+		iterator& operator ++()
+		{
+			n = n->next;
+			return *this;
+		}
+
+		iterator operator ++(int)
+		{
+			iterator copy(*this);
+			n = n->next;
+			return copy;
+		}
+
+		ElemType& operator *()
+		{
+			return n->elem;
+		}
+
+		const ElemType& operator *() const
+		{
+			return n->elem;
+		}
+
+		ElemType& operator ->()
+		{
+			return n->elem;
+		}
+
+		const ElemType& operator ->() const
+		{
+			return n->elem;
+		}
+
+		bool operator == (const iterator& other)
+		{
+			if (&other == this)
+				return true;
+
+			return n == other.n;
+		}
+
+		bool operator != (const iterator& other)
+		{
+			return !(*this == other);
+		}
+
+	private:
+		Node *n;
+	};
+
+	class reverse_iterator : public iterator
+	{
+	public:
+		reverse_iterator& operator ++()
+		{
+			n = n->pre;
+			return *this;
+		}
+
+		reverse_iterator operator ++(int)
+		{
+			reverse_iterator copy(*this);
+			n = n->pre;
+			return copy;
+		}
+
+	};
+
+public:
+	iterator begin() {
+		return iterator(_header.next);
+	}
+
+	iterator end() {
+		return iterator(&_header);
+	}
+
+	reverse_iterator rbegin() {
+		return iterator(_header.pre);
+	}
+
+	reverse_iterator rend() {
+		return iterator(&_header);
+	}
+
+private:
 	Node _header;
 };
 

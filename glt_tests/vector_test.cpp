@@ -35,5 +35,7 @@ int main(void)
 	{
 		std::cout << it->a << " " << it->b << std::endl;
 	}
+
+	system("pause");
 	return 0;
 }

@@ -144,19 +144,6 @@ public:
 			return *this;
 		}
 
-		iterator operator --(int)
-		{
-			iterator copy = *this;
-			--idx;
-			return copy;
-		}
-
-		iterator& operator --()
-		{
-			--idx;
-			return *this;
-		}
-
 		iterator& operator =(const iterator& other)
 		{
 			if (&other !== this)
@@ -223,18 +210,6 @@ public:
 			return *this;
 		}
 
-		reverse_iterator operator --(int)
-		{
-			reverse_iterator copy = *this;
-			++idx;
-			return copy;
-		}
-
-		reverse_iterator& operator --()
-		{
-			++idx;
-			return *this;
-		}
 	};
 
 public:

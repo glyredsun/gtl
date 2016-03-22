@@ -13,6 +13,6 @@ int main(void)
 		std::cout << is.top() << std::endl;
 		is.pop();
 	}
-
+	system("pause");
 	return 0;
 }
