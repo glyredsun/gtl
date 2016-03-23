@@ -10,7 +10,7 @@ extern "C" {
 #endif
 
 #ifndef offset_of
-#define offset_of(type, member)	(int)(&(((type*)0)->member))
+#define offset_of(type, member)	(size_t)(&(((type*)0)->member))
 #endif // !offset_of
 
 #ifndef container_of
@@ -20,14 +20,18 @@ extern "C" {
 #define	list_entry(ptr, type, member)	container_of(ptr, type, member)
 
 struct list_head {
-	struct list_head *prev;
-	struct list_head *next;
+	struct list_head *prev, *next;
 };
 
 #define	LIST_HEAD_INIT(name)	{&(name), &(name)}
 
 #define LIST_HEAD(name) \
 	struct list_head name = LIST_HEAD_INIT(name);
+
+static inline void list_init(struct list_head *list)
+{
+	list->next = list->prev = list;
+}
 
 static inline void list_add(struct list_head *n, struct list_head *head)
 {
@@ -51,6 +55,10 @@ static inline void list_del(struct list_head *h)
 	h->next->prev = h->prev;
 	h->next = h->prev = h;
 }
+
+#define list_empty(head)	((head)->next == (head))
+
+#define list_is_singular(head)	(!list_empty(head) && (head)->prev == (head)->next)
 
 #define list_foreach(pos, head) \
 	for (pos = (head)->next; pos != (head); pos = pos->next)

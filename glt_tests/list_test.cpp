@@ -5,6 +5,7 @@
 #include <iostream>
 
 #include <list>
+#include <assert.h>
 int main(void)
 {
 	gtl::list<int> *il = new gtl::list<int>;
@@ -42,11 +43,17 @@ int main(void)
 	S s3 = {3, LIST_HEAD_INIT(s3.list)};
 	S s4 = {4, LIST_HEAD_INIT(s4.list)};
 	S s5 = {5, LIST_HEAD_INIT(s5.list) };
+	S *s6 = (S*)malloc(sizeof(*s6));
+	list_init(&s6->list);
+	s6->n = 6;
+
+	list_add(&s6->list, &h);
 	list_add(&s1.list, &h);
 	list_add(&s2.list, &h);
 	list_add(&s3.list, &h);
 	list_add(&s4.list, &h);
 	list_add_tail(&s5.list, &h);
+
 	struct list_head *p;
 	struct list_head *n;
 	S *tmp;
@@ -54,19 +61,24 @@ int main(void)
 	{
 		tmp = container_of(p, S, list);
 		printf("%d\n", tmp->n);
-		if (tmp->n == 2 || tmp->n == 5) {
+		if (tmp->n == 6) {
 			list_del(p);
+			free(tmp);
 		}
 	}
-
+	
+	
 	putchar('\n');
 
-	list_foreach_prev(p, &h)
+	list_foreach_prev_safe(p, n, &h)
 	{
 		tmp = container_of(p, S, list);
 		printf("%d\n", tmp->n);
+		list_del(p);
 	}
 
+	assert(list_empty(&h));
+	assert(!list_is_singular(&h));
 	system("pause");
 	return 0;
 }

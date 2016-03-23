@@ -10,3 +10,6 @@ include_directories(vector_test ${gtl_dir})
 
 add_executable(list_test list_test.cpp)
 include_directories(list_test ${gtl_dir})
+
+add_executable(queue_test queue_test.cpp)
+include_directories(queue_test ${gtl_dir})

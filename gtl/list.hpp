@@ -14,14 +14,14 @@ class list
 {
 public:
 
-	list() : _header(ElemType(), &_header, &_header)
+	list() : _head(ElemType(), &_head, &_head)
 	{
 	}
 
 	~list()
 	{
-		Node *p = _header.next;
-		while (p != &_header)
+		Node *p = _head.next;
+		while (p != &_head)
 		{
 			Node *next = p->next;
 			delete p;
@@ -31,57 +31,57 @@ public:
 
 	void push_back(const ElemType &elem)
 	{
-		Node *newNode = new Node(elem, _header.pre, &_header);
-		_header.pre->next = newNode;
-		_header.pre = newNode;
+		Node *newNode = new Node(elem, _head.pre, &_head);
+		_head.pre->next = newNode;
+		_head.pre = newNode;
 	}
 
 	void push_front(const ElemType &elem)
 	{
-		Node *newNode = new Node(elem, &_header, _header.next);
-		_header.next->pre = newNode;
-		_header.next = newNode;
+		Node *newNode = new Node(elem, &_head, _head.next);
+		_head.next->pre = newNode;
+		_head.next = newNode;
 	}
 
 	ElemType &front()
 	{
-		return _header.next->elem;
+		return _head.next->elem;
 	}
 
 	const ElemType &front() const
 	{
-		return _header.next->elem;
+		return _head.next->elem;
 	}
 
 	ElemType &back()
 	{
-		return _header.pre->elem;
+		return _head.pre->elem;
 	}
 
 	const ElemType &back() const
 	{
-		return _header.pre->elem;
+		return _head.pre->elem;
 	}
 
 	void pop_front()
 	{
-		Node *frontNode = _header.next;
-		_header.next = frontNode->next;
-		frontNode->next->pre = &_header;
+		Node *frontNode = _head.next;
+		_head.next = frontNode->next;
+		frontNode->next->pre = &_head;
 		delete frontNode;
 	}
 
 	void pop_back()
 	{
-		Node *backNode = _header.pre;
-		_header.pre = backNode->pre;
-		backNode->pre->next = &_header;
+		Node *backNode = _head.pre;
+		_head.pre = backNode->pre;
+		backNode->pre->next = &_head;
 		delete backNode;
 	}
 
 	bool empty()
 	{
-		return _header.next == &_header;
+		return _head.next == &_head;
 	}
 
 private:
@@ -176,23 +176,23 @@ public:
 
 public:
 	iterator begin() {
-		return iterator(_header.next);
+		return iterator(_head.next);
 	}
 
 	iterator end() {
-		return iterator(&_header);
+		return iterator(&_head);
 	}
 
 	reverse_iterator rbegin() {
-		return iterator(_header.pre);
+		return iterator(_head.pre);
 	}
 
 	reverse_iterator rend() {
-		return iterator(&_header);
+		return iterator(&_head);
 	}
 
 private:
-	Node _header;
+	Node _head;
 };
 
 
