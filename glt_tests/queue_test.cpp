@@ -25,19 +25,34 @@ int main(void)
 		q.push(i);
 	}
 
+	size_t s = q.size();
+	printf("q size %d\n", s);
 	gtl::queue<int> q1(q);
-	gtl::queue<int> q2(std::move(q));
+	gtl::queue<int> q2;
+	q2 = q;
+	gtl::queue<int> q3(std::move(q));
+	
+
+	assert(s == q1.size() && s == q2.size() && s == q3.size());
 
 	assert(q.empty());
 
 	while (!q1.empty()) {
-		assert(q1.front() == q2.front());
+		assert(q1.front() == q2.front() && q2.front() == q3.front());
+		printf("front is %d\n", q2.front());
 		q1.pop();
 		q2.pop();
+		q3.pop();
 	}
 
 	assert(q2.empty());
+	assert(q3.empty());
+
+	printf("-------------------------------------------------------------\n");
+
+	q.clear();
 
 	system("pause");
+	
 	return 0;
 }

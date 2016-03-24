@@ -16,60 +16,65 @@ class queue
 {
 public:
 
-	queue(size_t capacity = 16)
-		: _front(0), _back(0), _capacity(capacity), _elems(nullptr)
+	queue(size_t capacity = MIN_CAPACITY)
 	{
-		if (_capacity != 0) {
-			_elems = new ElemType[_capacity];
-		}
+		reserve(capacity >= MIN_CAPACITY ? capacity : MIN_CAPACITY);
 	}
 
 	~queue()
 	{
-		if (_elems)
-			delete[] _elems;
+		freeMemory();
 	}
 
 	queue(const queue &other)
-		: queue(other._capacity)
 	{
-		_front = other._front;
-		_back = other._back;
-
-		if (_front < _back) {
-			for (size_t i = _front; i < _back; i++)
-			{
-				_elems[i] = other._elems[i];
-			}
-		}
-		else if (_front > _back) {
-			for (size_t i = 0; i < _back; i++)
-			{
-
-				_elems[i] = other._elems[i];
-			}
-			for (size_t i = _front; i < _capacity; i++)
-			{
-				_elems[i] = other._elems[i];
-			}
-		}
+		copyFrom(other);
 	}
 
 	queue(queue&& other)
-		: queue(0)
 	{
-		std::swap(_front, other._front);
-		std::swap(_back, other._back);
-		std::swap(_capacity, other._capacity);
-		std::swap(_elems, other._elems);
+		moveFrom(other);
 	}
 
-	bool empty() {
+	queue& operator =(const queue& other)
+	{
+		if (this != &other) {
+			copyFrom(other);
+		}
+		return *this;
+	}
+
+	queue& operator =(queue&& other)
+	{
+		if (this != other) {
+			moveFrom(other);
+		}
+		return *this;
+	}
+
+	bool empty() const {
 		return _front == _back;
 	}
 
-	bool full() {
+	bool full() const {
 		return (_back + 1) % _capacity == _front;
+	}
+
+	void clear() {
+		_front = _back = 0;
+	}
+
+	size_t size() const {
+
+		if (_front == _back) {
+			return 0;
+		}
+		else if (_front < _back) {
+			return _back - _front;
+		}
+		else {
+			return _capacity - _front + _back;
+		}
 	}
 
 	void push(const ElemType &elem) {
@@ -88,42 +93,90 @@ public:
 		return _elems[_front];
 	}
 
+	const ElemType& front() const {
+		return _elems[_front];
+	}
+
 protected:
 
+	void copyFrom(const queue &other) {
+
+		clear();
+
+		if (other.size() + 1 > _capacity) {
+			freeMemory();
+			reserve(other._capacity);
+		}
+
+		duplicate(other._elems, other._front, other._back, other._capacity);
+	}
+
+	
+	void moveFrom(queue &other) {
+
+		freeMemory();
+
+		std::swap(_front, other._front);
+		std::swap(_back, other._back);
+		std::swap(_capacity, other._capacity);
+		std::swap(_elems, other._elems);
+	}
+
 	void reserve(size_t newCapacity) {
-		ElemType *newElems = new ElemType[newCapacity];
-		size_t idx = 0;
-		if (_front < _back) {
-			for (size_t i = _front; i < _back && idx < newCapacity - 1; i++)
-			{
-				newElems[idx++] = _elems[i];
-			}
-		}
-		else if (_front > _back) {
-			for (size_t i = 0; i < _back && idx < newCapacity - 1; i++)
-			{
-				newElems[idx++] = _elems[i];
-			}
-			for (size_t i = _front; i < _capacity && idx < newCapacity - 1; i++)
-			{
-				newElems[idx++] = _elems[i];
-			}
-		}
+		
+		ElemType *oldElems = _elems;
+		_elems = new ElemType[newCapacity];
 
-		if (_elems)
-			delete[] _elems;
-
-		_elems = newElems;
-		_front = 0;
-		_back = idx;
+		if (oldElems) {
+			duplicate(oldElems, _front, _back, _capacity);
+			delete[] oldElems;
+		}
+		
 		_capacity = newCapacity;
 	}
 
+	void duplicate(ElemType *elems, size_t front, size_t back, size_t capacity)
+	{
+		size_t idx = 0;
+
+		if (front < back) {
+			for (size_t i = front; i < back; i++)
+			{
+				_elems[idx++] = elems[i];
+			}
+		}
+		else if (front > back) {
+			for (size_t i = front; i < capacity; i++)
+			{
+				_elems[idx++] = elems[i];
+			}
+			for (size_t i = 0; i < back; i++)
+			{
+				_elems[idx++] = elems[i];
+			}
+		}
+
+		_front = 0;
+		_back = idx;
+	}
+
+	void freeMemory()
+	{
+		if (_elems) {
+			delete[] _elems;
+			_elems = nullptr;
+			_front = _back = _capacity = 0;
+		}
+	}
+
 private:
-	ElemType *_elems;
-	size_t _front;
-	size_t _back;
-	size_t _capacity;
+	static const int MIN_CAPACITY = 16;
+
+private:
+	ElemType *_elems{nullptr};
+	size_t _front{0};
+	size_t _back{0};
+	size_t _capacity{0};
 };
 
 NS_END(gtl)

@@ -14,32 +14,53 @@ class list
 {
 public:
 
-	list() : _head(ElemType(), &_head, &_head)
+	list()
 	{
+
 	}
 
 	~list()
 	{
-		Node *p = _head.next;
-		while (p != &_head)
-		{
-			Node *next = p->next;
-			delete p;
-			p = next;
+		clear();
+	}
+
+	list(const list &other)
+	{
+		copyFrom(other);
+	}
+
+	list(list &&other)
+	{
+		moveFrom(other);
+	}
+
+	list& operator =(const list &other)
+	{
+		if (this != &other) {
+			copyFrom(other);
 		}
+		return *this;
+	}
+
+	list& operator =(list &&other)
+	{
+		if (this != &other) {
+			moveFrom(other);
+		}
+		return *this;
 	}
 
 	void push_back(const ElemType &elem)
 	{
-		Node *newNode = new Node(elem, _head.pre, &_head);
-		_head.pre->next = newNode;
-		_head.pre = newNode;
+		Node *newNode = new Node(elem, _head.prev, &_head);
+		_head.prev->next = newNode;
+		_head.prev = newNode;
 	}
 
 	void push_front(const ElemType &elem)
 	{
 		Node *newNode = new Node(elem, &_head, _head.next);
-		_head.next->pre = newNode;
+		_head.next->prev = newNode;
 		_head.next = newNode;
 	}
 
@@ -55,53 +76,116 @@ public:
 
 	ElemType &back()
 	{
-		return _head.pre->elem;
+		return _head.prev->elem;
 	}
 
 	const ElemType &back() const
 	{
-		return _head.pre->elem;
+		return _head.prev->elem;
 	}
 
 	void pop_front()
 	{
 		Node *frontNode = _head.next;
 		_head.next = frontNode->next;
-		frontNode->next->pre = &_head;
+		frontNode->next->prev = &_head;
 		delete frontNode;
 	}
 
 	void pop_back()
 	{
-		Node *backNode = _head.pre;
-		_head.pre = backNode->pre;
-		backNode->pre->next = &_head;
+		Node *backNode = _head.prev;
+		_head.prev = backNode->prev;
+		backNode->prev->next = &_head;
 		delete backNode;
 	}
 
-	bool empty()
+	void clear()
+	{
+		freeMemory(_head.next, &_head);
+		_head.prev = _head.next = &_head;
+	}
+
+	bool empty() const
 	{
 		return _head.next == &_head;
 	}
 
-private:
+protected:
+
 	struct Node {
 		ElemType elem;
-		Node *pre;
+		Node *prev;
 		Node *next;
 
-		Node(const ElemType &elem, Node *pre, Node *next) : elem(elem), pre(pre), next(next) {
+		Node(const ElemType &elem, Node *prev = nullptr, Node *next = nullptr) : elem(elem), prev(prev), next(next) {
 			printf("%s %p\n", __FUNCTION__, this);
 		}
+
 		~Node() {
 			printf("%s %p\n", __FUNCTION__, this);
 		}
 	};
 
+	void freeMemory(Node *first, Node *head)
+	{
+		for (Node *p = first, *n = p->next; p != head; p = n, n = p->next) {
+			delete p;
+		}
+	}
+
+	void copyFrom(const list& other) 
+	{
+		if (other.empty()) {
+			clear();
+			return;
+		}
+
+		Node *p = other._head.next;
+		Node *n = _head.next;
+
+		while (n != &_head && p != &other._head)
+		{
+			n->elem = p->elem;
+			n = n->next;
+			p = p->next;
+		}
+
+		if (n != &_head) {
+			n->prev->next = &_head;
+			_head.prev = n->prev;
+			freeMemory(n, &_head);
+		}
+
+		while (p != &other._head) {
+			push_back(p->elem);
+			p = p->next;
+		}
+	}
+
+	void moveFrom(list &other)
+	{
+		clear();
+
+		if (other.empty()) {
+			return;
+		}
+
+		_head.next = other._head.next;
+		_head.prev = other._head.prev;
+		other._head.next->prev = &_head;
+		other._head.prev->next = &_head;
+
+		other._head.next = &other._head;
+		other._head.prev = &other._head;
+	}
+
+
 public:
 
 	class iterator
 	{
+		friend class list;
 	public:
 		iterator(Node *n) :n(n) {}
 		iterator(const iterator& other) : iterator(other.n) {}
@@ -161,14 +245,14 @@ public:
 	public:
 		reverse_iterator& operator ++()
 		{
-			n = n->pre;
+			n = n->prev;
 			return *this;
 		}
 
 		reverse_iterator operator ++(int)
 		{
 			reverse_iterator copy(*this);
-			n = n->pre;
+			n = n->prev;
 			return copy;
 		}
 
@@ -184,15 +268,23 @@ public:
 	}
 
 	reverse_iterator rbegin() {
-		return iterator(_head.pre);
+		return iterator(_head.prev);
 	}
 
 	reverse_iterator rend() {
 		return iterator(&_head);
 	}
 
+	void insert(const iterator &where, const ElemType &elem) {
+		Node *newNode = new Node(elem);
+		newNode->next = where.n;
+		newNode->prev = where.n->prev;
+		where.n->prev->next = newNode;
+		where.n->prev = newNode;
+	}
+
 private:
-	Node _head;
+	Node _head{ElemType(), &_head, &_head};
 };
 
 

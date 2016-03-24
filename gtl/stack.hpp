@@ -24,6 +24,35 @@ public:
 	{
 	}
 
+	stack(const stack& other)
+		: _container(other._container)
+	{
+	}
+
+	stack(stack&& other)
+		: _container(std::move(other._container))
+	{
+	}
+
+	stack& operator =(const stack& other)
+	{
+		if (this != &other)
+		{
+			_container = other._container;
+		}
+		return *this;
+	}
+
+	stack& operator =(const stack&& other)
+	{
+		if (this != &other)
+		{
+			_container = std::move(other._container);
+		}
+		return *this;
+	}
+
+
 	void push(const T &elem) {
 		T copy = elem;
 		push(std::move(copy));

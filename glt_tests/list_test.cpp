@@ -9,10 +9,19 @@
 int main(void)
 {
 	gtl::list<int> *il = new gtl::list<int>;
+
+	gtl::list<int>::iterator it1 = il->begin();
+	il->insert(it1, 10000);
+
 	il->push_back(1);
 	il->push_front(2);
 	il->push_back(3);
 	il->push_front(4);
+
+	gtl::list<int>::iterator it2 = il->begin();
+	il->insert(it2, 1000);
+	++it2; ++it2;
+	il->insert(it2, 100);
 
 	std::cout << "traverse il by iterator" << std::endl;
 	for (gtl::list<int>::iterator it = il->begin(); it != il->end(); ++it)
@@ -20,18 +29,25 @@ int main(void)
 		std::cout << *it << std::endl;
 	}
 
-	std::cout << "pop everyone in il" << std::endl;
-	std::list<int> l;
-	il->pop_back();
-	while (!il->empty())
-	{
-		std::cout << il->front() << std::endl;
-		il->pop_front();
-	}
+	gtl::list<int> il1(*il);
+	gtl::list<int> il2;
+	il2.push_back(1);
+	il2.push_back(2);
+	il2.push_back(3);
+	il2.push_back(4);
+	il2.push_back(5);
+	il2.push_back(6);
+	il2 = *il;
+	gtl::list<int> *il3 = new gtl::list<int>(std::move(*il));
+
 
 	std::cout << "before delete il" << std::endl;
 	delete il;
 	std::cout << "after delete il" << std::endl;
+
+	std::cout << "before delete il3" << std::endl;
+	delete il3;
+	std::cout << "after delete il3" << std::endl;
 
 	printf("c list test\n");
 	struct list_head h = LIST_HEAD_INIT(h);

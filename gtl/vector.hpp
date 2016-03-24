@@ -16,43 +16,29 @@ class vector
 public:
 	vector(size_t initSize = 0)
 		: _size{ initSize }
-		, _capacity{ initSize + SPARE_SIZE }
 	{
-		_datas = new T[_capacity];
+		reserve(_size + SPARE_SIZE);
 	}
 
 	~vector()
 	{
-		if (_datas)
-			delete[] _datas;
+		freeMomery();
 	}
 
 	vector(const vector& other)
-		: _size{ other._size }
-		, _capacity{ other._capacity }
 	{
-		_datas = new T[_capacity];
-		for (size_t i = 0; i < _size; i++)
-		{
-			_datas[i] = other._datas[i];
-		}
+		copyFrom(other);
 	}
 
 	vector(vector&& other)
-		: _size{ other._size }
-		, _capacity{ other._size }
-		, _datas{ other._datas }
 	{
-		other._capacity = 0;
-		other._size = 0;
-		other._datas = nullptr;
+		moveFrom(other);
 	}
 
 	vector& operator=(const vector& other)
 	{
 		if (this != &other) {
-			vector copy(other);
-			std::swap(*this, copy);
+			copyFrom(other);
 		}
 		return *this;
 	}
@@ -60,9 +46,7 @@ public:
 	vector& operator=(vector&& other)
 	{
 		if (this != &other) {
-			swap(this->_size, other._size);
-			swap(this->_capacity, other._capacity);
-			swap(this->_datas, other._datas);
+			moveFrom(other);
 		}
 		return *this;
 	}
@@ -107,7 +91,10 @@ public:
 		}
 
 		_capacity = newCapacity;
-		delete[] _datas;
+
+		if (_datas)
+			delete[] _datas;
+
 		_datas = newDatas;
 	}
 
@@ -119,6 +106,45 @@ public:
 	void push_back(const T& data) {
 		T copy = data;
 		push_back(std::move(copy));
+	}
+
+	void clear() {
+		_size = 0;
+	}
+
+protected:
+
+	void copyFrom(const vector &other)
+	{
+		if (_capacity < other._size)
+		{
+			freeMomery();
+		}
+
+		resize(other._size);
+
+		for (size_t i = 0; i < _size; i++)
+		{
+			_datas[i] = other._datas[i];
+		}
+	}
+
+	void moveFrom(vector &other)
+	{
+		freeMomery();
+		std::swap(_size, other._size);
+		std::swap(_capacity, other._capacity);
+		std::swap(_datas, other._datas);
+	}
+
+	void freeMomery()
+	{
+		if (_datas) {
+			delete[] _datas;
+			_datas = nullptr;
+			_size = 0;
+			_capacity = 0;
+		}
 	}
 
 public:
@@ -236,9 +262,9 @@ public:
 
 private:
 	static const size_t SPARE_SIZE = 16;
-	size_t _capacity;
-	size_t _size;
-	T *_datas;
+	size_t _capacity{0};
+	size_t _size{0};
+	T *_datas{nullptr};
 };
 
 NS_END(gtl)

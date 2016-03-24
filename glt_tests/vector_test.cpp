@@ -5,8 +5,11 @@
 #include <vector>
 int main(void)
 {
-	std::vector<int> sv;
+	std::vector<int> sv1{1, 2, 3};
+	std::vector<int> sv2{ 4, 5, 6 };
 	
+	sv1 = std::move(sv2);
+
 	struct S
 	{
 		int a;
@@ -28,6 +31,9 @@ int main(void)
 	{
 		std::cout << s-- << ":" << *it << std::endl;
 	}
+
+	gtl::vector<int> v1(v);
+	gtl::vector<int> v2(std::move(v));
 
 	gtl::vector<S> vs;
 	vs.push_back({ 1, 2 });
