@@ -3,6 +3,7 @@
 #endif // _MSC_VER
 
 #ifndef _MACROS_HPP_
+#define _MACROS_HPP_
 
 #define	NS_BEGIN(ns)	namespace ns {
 

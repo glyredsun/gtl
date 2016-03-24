@@ -14,22 +14,24 @@ int main(void)
 	il->push_back(3);
 	il->push_front(4);
 
-	//std::list<int> l;
-	//il->pop_back();
-	//while (!il.empty())
-	//{
-	//	std::cout << il.front() << std::endl;
-	//	il.pop_front();
-	//}
-
+	std::cout << "traverse il by iterator" << std::endl;
 	for (gtl::list<int>::iterator it = il->begin(); it != il->end(); ++it)
 	{
 		std::cout << *it << std::endl;
 	}
 
- 	system("pause"); 
+	std::cout << "pop everyone in il" << std::endl;
+	std::list<int> l;
+	il->pop_back();
+	while (!il->empty())
+	{
+		std::cout << il->front() << std::endl;
+		il->pop_front();
+	}
+
+	std::cout << "before delete il" << std::endl;
 	delete il;
-	system("pause");
+	std::cout << "after delete il" << std::endl;
 
 	printf("c list test\n");
 	struct list_head h = LIST_HEAD_INIT(h);
@@ -57,6 +59,8 @@ int main(void)
 	struct list_head *p;
 	struct list_head *n;
 	S *tmp;
+
+	printf("list_foreach_safe\n");
 	list_foreach_safe(p, n, &h)
 	{
 		tmp = container_of(p, S, list);
@@ -68,8 +72,19 @@ int main(void)
 	}
 	
 	
-	putchar('\n');
+	printf("list_foreach_entry\n");
+	list_foreach_entry(tmp, S, &h, list)
+	{
+		printf("%d\n", tmp->n);
+	}
 
+	printf("list_foreach_entry_reverse\n");
+	list_foreach_entry_reverse(tmp, S, &h, list)
+	{
+		printf("%d\n", tmp->n);
+	}
+
+	printf("list_foreach_prev_safe\n");
 	list_foreach_prev_safe(p, n, &h)
 	{
 		tmp = container_of(p, S, list);

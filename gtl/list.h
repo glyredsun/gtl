@@ -21,7 +21,23 @@ extern "C" {
 #define list_head_of(container_ptr, type, member)	(list_head*)((const char*)container_ptr + offset_of(type, member))
 #endif // !list_of
 
-#define	list_entry(ptr, type, member)	container_of(ptr, type, member)
+#define	list_entry(ptr, type, member) \
+	container_of(ptr, type, member)
+
+#define list_first_entry(ptr, type, member) \
+	list_entry((ptr)->next, type, member)
+
+#define list_last_entry(ptr, type, member) \
+	list_entry((ptr)->prev, type, member)
+
+#define list_first_entry_or_null(ptr, type, member) \
+	(!list_empty(ptr) ? list_first_entry(ptr, type, member) : NULL)
+
+#define list_next_entry(pos, type, member) \
+	list_entry((pos)->member.next, type, member)
+
+#define list_prev_entry(pos, type, member) \
+	list_entry((pos)->member.prev, type, member)
 
 struct list_head {
 	struct list_head *prev, *next;
@@ -115,6 +131,12 @@ static inline void list_move_tail(struct list_head *list, struct list_head *head
 
 #define list_foreach_prev_safe(pos, n, head) \
 	for (pos = (head)->prev, n = pos->prev; pos != (head); pos = n, n = pos->prev)
+
+#define list_foreach_entry(pos, type, head, member) \
+	for (pos = list_first_entry(head, type, member); &pos->member != (head); pos = list_next_entry(pos, type, member))
+
+#define list_foreach_entry_reverse(pos, type, head, member) \
+	for (pos = list_last_entry(head, type, member); &pos->member != (head); pos = list_prev_entry(pos, type, member))
 
 #ifdef __cplusplus
 };
