@@ -14,8 +14,12 @@ extern "C" {
 #endif // !offset_of
 
 #ifndef container_of
-#define container_of(ptr, type, member)		(type*)((const char*)ptr - offset_of(type, member))
+#define container_of(list_ptr, type, member)		(type*)((const char*)list_ptr - offset_of(type, member))
 #endif // !container_of
+
+#ifndef list_head_of
+#define list_head_of(container_ptr, type, member)	(list_head*)((const char*)container_ptr + offset_of(type, member))
+#endif // !list_of
 
 #define	list_entry(ptr, type, member)	container_of(ptr, type, member)
 
@@ -33,32 +37,72 @@ static inline void list_init(struct list_head *list)
 	list->next = list->prev = list;
 }
 
+static inline void __list_add(struct list_head *n, struct list_head *prev, struct list_head *next)
+{
+	n->next = next;
+	n->prev = prev;
+	prev->next = n;
+	next->prev = n;
+}
+
 static inline void list_add(struct list_head *n, struct list_head *head)
 {
-	head->next->prev = n;
-	n ->next = head->next;
-	head->next = n;
-	n->prev = head;
+	__list_add(n, head, head->next);
 }
 
 static inline void list_add_tail(struct list_head *n, struct list_head *head)
 {
-	head->prev->next = n;
-	n->prev = head->prev;
-	head->prev = n;
-	n->next = head;
+	__list_add(n, head->prev, head);
 }
 
-static inline void list_del(struct list_head *h)
+static inline void __list_del(struct list_head *prev, struct list_head *next)
 {
-	h->prev->next = h->next;
-	h->next->prev = h->prev;
-	h->next = h->prev = h;
+	prev->next = next;
+	next->prev = prev;
+}
+
+static inline void list_del(struct list_head *head)
+{
+	__list_del(head->prev, head->next);
+}
+
+static inline void list_del_init(struct list_head *head)
+{
+	__list_del(head->prev, head->next);
+	list_init(head);
+}
+
+static inline void list_replace(struct list_head *o, struct  list_head *n)
+{
+	n->next = o->next;
+	n->prev = o->prev;
+	o->prev->next = n;
+	o->next->prev = n;
+}
+
+static inline void list_replace_init(struct list_head *o, struct list_head *n)
+{
+	list_replace(o, n);
+	list_init(o);
+}
+
+static inline void list_move(struct list_head *list, struct list_head *head)
+{
+	list_del(list);
+	list_add(list, head);
+}
+
+static inline void list_move_tail(struct list_head *list, struct list_head *head)
+{
+	list_del(list);
+	list_add_tail(list, head);
 }
 
 #define list_empty(head)	((head)->next == (head))
 
 #define list_is_singular(head)	(!list_empty(head) && (head)->prev == (head)->next)
+
+#define list_is_last(entry, head)	((entry)->next == (head))
 
 #define list_foreach(pos, head) \
 	for (pos = (head)->next; pos != (head); pos = pos->next)

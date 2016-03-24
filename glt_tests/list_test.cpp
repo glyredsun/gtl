@@ -62,7 +62,7 @@ int main(void)
 		tmp = container_of(p, S, list);
 		printf("%d\n", tmp->n);
 		if (tmp->n == 6) {
-			list_del(p);
+			list_del_init(p);
 			free(tmp);
 		}
 	}

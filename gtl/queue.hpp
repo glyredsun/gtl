@@ -113,10 +113,10 @@ protected:
 		if (_elems)
 			delete[] _elems;
 
+		_elems = newElems;
 		_front = 0;
 		_back = idx;
 		_capacity = newCapacity;
-		_elems = newElems;
 	}
 
 private:
