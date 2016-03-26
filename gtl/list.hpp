@@ -7,6 +7,8 @@
 
 #include <macros.hpp>
 
+#include <initializer_list>
+
 NS_BEGIN(gtl);
 
 template <typename ElemType>
@@ -118,6 +120,11 @@ protected:
 		Node *prev;
 		Node *next;
 
+
+		Node(const ElemType &&elem, Node *prev = nullptr, Node *next = nullptr) : elem(elem), prev(prev), next(next) {
+			printf("%s %p\n", __FUNCTION__, this);
+		}
+
 		Node(const ElemType &elem, Node *prev = nullptr, Node *next = nullptr) : elem(elem), prev(prev), next(next) {
 			printf("%s %p\n", __FUNCTION__, this);
 		}
@@ -199,7 +206,20 @@ public:
 		iterator operator ++(int)
 		{
 			iterator copy(*this);
-			n = n->next;
+			++*this;
+			return copy;
+		}
+
+		iterator& operator --()
+		{
+			n = n->prev;
+			return *this;
+		}
+
+		iterator operator --(int)
+		{
+			iterator copy(*this);
+			--*this;
 			return copy;
 		}
 
@@ -275,12 +295,31 @@ public:
 		return iterator(&_head);
 	}
 
-	void insert(const iterator &where, const ElemType &elem) {
+	void insert(const iterator &where, const ElemType &&elem) {
 		Node *newNode = new Node(elem);
 		newNode->next = where.n;
 		newNode->prev = where.n->prev;
 		where.n->prev->next = newNode;
 		where.n->prev = newNode;
+	}
+
+	void insert(const iterator &where, const ElemType &elem) {
+		insert(where, std::move(ElemType(elem)));
+	}
+
+	void insert(const iterator &where, size_t count, const ElemType &elem) {
+		while (count-- >0)
+		{
+			insert(where, elem);
+		}
+	}
+
+	void insert(const iterator &where, std::initializer_list<ElemType> list)
+	{
+		for(const ElemType &elem : list)
+		{
+			insert(where, std::move(elem));
+		}
 	}
 
 private:

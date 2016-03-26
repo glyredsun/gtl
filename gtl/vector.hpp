@@ -6,11 +6,13 @@
 #define _VECTOR_HPP_
 
 #include <macros.hpp>
-#include <algorithm>
+#include <memory.hpp>
+
+#include <algorithm.hpp>
 
 NS_BEGIN(gtl)
 
-template<typename T>
+template<typename ElemType>
 class vector
 {
 public:
@@ -51,11 +53,11 @@ public:
 		return *this;
 	}
 
-	T& operator[](size_t idx) {
+	ElemType& operator[](size_t idx) {
 		return _datas[idx];
 	}
 
-	const T& operator[](size_t idx) const {
+	const ElemType& operator[](size_t idx) const {
 		return _datas[idx];
 	}
 
@@ -83,7 +85,7 @@ public:
 			return;
 		}
 
-		T *newDatas = new T[newCapacity];
+		ElemType *newDatas = new ElemType[newCapacity];
 
 		for (size_t i = 0; i < _size; i++)
 		{
@@ -98,13 +100,13 @@ public:
 		_datas = newDatas;
 	}
 
-	void push_back(T&& data) {
+	void push_back(ElemType&& data) {
 		resize(_size + 1);
 		_datas[_size - 1] = data;
 	}
 
-	void push_back(const T& data) {
-		T copy = data;
+	void push_back(const ElemType& data) {
+		ElemType copy = data;
 		push_back(std::move(copy));
 	}
 
@@ -132,9 +134,9 @@ protected:
 	void moveFrom(vector &other)
 	{
 		freeMomery();
-		std::swap(_size, other._size);
-		std::swap(_capacity, other._capacity);
-		std::swap(_datas, other._datas);
+		gtl::swap(_size, other._size);
+		gtl::swap(_capacity, other._capacity);
+		gtl::swap(_datas, other._datas);
 	}
 
 	void freeMomery()
@@ -147,9 +149,42 @@ protected:
 		}
 	}
 
+	void shiftElems(size_t begin, int shift)
+	{
+		ElemType *src = _datas;
+
+		if (_size + shift > _capacity) {
+			_datas = new ElemType[(_size + shift) * 2];
+			for (size_t i = 0; i < begin; i++)
+			{
+				_datas[i] = std::move(src[i]);
+			}
+		}
+		
+		if (shift < 0) {
+			for (size_t i = begin; i < _size; ++i)
+			{
+				_datas[i + shift] = std::move(src[i]);
+			}
+		}
+		else if (shift > 0) {
+			for (size_t i = _size - 1; i >= begin; --i)
+			{
+				_datas[i + shift] = std::move(src[i]);
+			}
+		}
+		_size = _size + shift;
+
+		if (src != _datas) {
+			delete[] src;
+		}
+	}
+
 public:
 	class iterator
 	{
+		friend class vector;
+	
 	public:
 		iterator(vector *v, int idx)
 			: vectPtr(v), idx(idx)
@@ -157,17 +192,45 @@ public:
 
 		}
 
-		iterator operator ++(int)
-		{
-			iterator copy = *this;
-			++idx;
-			return copy;
-		}
-
 		iterator& operator ++()
 		{
 			++idx;
 			return *this;
+		}
+
+		iterator operator ++(int)
+		{
+			iterator copy = *this;
+			++*this;
+			return copy;
+		}
+
+		iterator& operator --()
+		{
+			++idx;
+			return *this;
+		}
+
+		iterator operator --(int)
+		{
+			iterator copy = *this;
+			--*this;
+			return copy;
+		}
+
+		iterator operator +(int offset) const
+		{
+			return iterator(vectPtr, idx + offset);
+		}
+
+		iterator operator -(int offset) const
+		{
+			return *this + (-offset);
+		}
+
+		int operator -(const iterator &right) const
+		{
+			return idx - right.idx;
 		}
 
 		iterator& operator =(const iterator& other)
@@ -180,17 +243,17 @@ public:
 			return *this;
 		}
 
-		T* operator ->()
+		ElemType* operator ->()
 		{
 			return &(*vectPtr)[idx];
 		}
 
-		const T* operator ->() const
+		const ElemType* operator ->() const
 		{
 			return &(*vectPtr)[idx];
 		}
 
-		T& operator*()
+		ElemType& operator*()
 		{
 			return (*vectPtr)[idx];
 		}
@@ -260,12 +323,52 @@ public:
 		return reverse_iterator(this, -1);
 	}
 
+	void erase(const iterator &where)
+	{
+		shiftElems(where.idx + 1, -1);
+	}
+
+	void erase(const iterator &first, const iterator &last)
+	{
+		int shift = last - first;
+		shiftElems(last.idx, -shift);
+	}
+
+	void insert(const iterator &where, ElemType &&data)
+	{
+		shiftElems(where.idx, 1);
+		_datas[where.idx] = data;
+	}
+
+	void insert(const iterator &where, const ElemType &data)
+	{
+		insert(where, std::move(ElemType(data)));
+	}
+
+	void insert(iterator &where, size_t count, const ElemType &data)
+	{
+		while (count-- > 0)
+		{
+			insert(where++, std::move(ElemType(data)));
+		}
+	}
+
+	void insert(iterator where, std::initializer_list<ElemType> list)
+	{
+
+		for (std::initializer_list<ElemType>::iterator itr = list.begin(); itr < list.end(); ++itr)
+		{
+			insert(where++, std::move(*itr));
+		}
+	}
+
 private:
 	static const size_t SPARE_SIZE = 16;
 	size_t _capacity{0};
 	size_t _size{0};
-	T *_datas{nullptr};
+	ElemType *_datas{nullptr};
 };
 
 NS_END(gtl)
+
 #endif // !_VECTOR_HPP_
