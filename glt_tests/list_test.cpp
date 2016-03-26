@@ -22,6 +22,7 @@ int main(void)
 	il->insert(it2, 1000);
 	++it2; ++it2;
 	il->insert(it2, 100);
+	il->insert(--it2, {11111, 22222, 33333, 44444});
 
 	std::cout << "traverse il by iterator" << std::endl;
 	for (gtl::list<int>::iterator it = il->begin(); it != il->end(); ++it)
