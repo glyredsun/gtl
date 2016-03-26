@@ -330,6 +330,11 @@ public:
 
 	void erase(const iterator &first, const iterator &last)
 	{
+		if (first == begin() && last == end()) {
+			clear();
+			return;
+		}
+
 		int shift = last - first;
 		shiftElems(last.idx, -shift);
 	}

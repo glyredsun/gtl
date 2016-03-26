@@ -30,6 +30,15 @@ int main(void)
 		std::cout << *it << std::endl;
 	}
 
+	std::cout << "erase1" << std::endl;
+	il->erase(il->begin() + 1, il->begin() + 3);
+	
+	for (gtl::list<int>::iterator it = il->begin(); it != il->end(); ++it)
+	{
+		std::cout << *it << std::endl;
+	}
+
+
 	gtl::list<int> il1(*il);
 	gtl::list<int> il2;
 	il2.push_back(1);

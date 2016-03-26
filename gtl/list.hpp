@@ -223,6 +223,26 @@ public:
 			return copy;
 		}
 
+		iterator operator +(int count)
+		{
+			Node *node = n;
+			while (count-- > 0)
+			{
+				node = node->next;
+			}
+			return iterator(node);
+		}
+
+		iterator operator -(int count)
+		{
+			Node *node = n;
+			while (count-- > 0)
+			{
+				node = node->prev;
+			}
+			return iterator(node);
+		}
+
 		ElemType& operator *()
 		{
 			return n->elem;
@@ -308,7 +328,7 @@ public:
 	}
 
 	void insert(const iterator &where, size_t count, const ElemType &elem) {
-		while (count-- >0)
+		while (count-- > 0)
 		{
 			insert(where, elem);
 		}
@@ -316,10 +336,26 @@ public:
 
 	void insert(const iterator &where, std::initializer_list<ElemType> list)
 	{
-		for(const ElemType &elem : list)
+		for (const ElemType &elem : list)
 		{
 			insert(where, std::move(elem));
 		}
+	}
+
+	void erase(const iterator &where)
+	{
+		Node *n = where.n;
+		n->next->prev = n->prev;
+		n->prev->next = n->next;
+		delete n;
+	}
+
+	void erase(const iterator &first, const iterator &last)
+	{
+		first.n->prev->next = last.n;
+		last.n->prev = first.n->prev;
+
+		freeMemory(first.n, last.n);
 	}
 
 private:
