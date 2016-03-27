@@ -13,3 +13,6 @@ include_directories(list_test ${gtl_dir})
 
 add_executable(queue_test queue_test.cpp)
 include_directories(queue_test ${gtl_dir})
+
+add_executable(bstree_test bstree_test.cpp)
+include_directories(bstree_test_test ${gtl_dir})

@@ -152,32 +152,35 @@ protected:
 	void shiftElems(size_t begin, int shift)
 	{
 		ElemType *src = _datas;
+		int newSize = _size + shift;
 
-		if (_size + shift > _capacity) {
-			_datas = new ElemType[(_size + shift) * 2];
-			for (size_t i = 0; i < begin; i++)
-			{
-				_datas[i] = std::move(src[i]);
-			}
-		}
-		
 		if (shift < 0) {
+
 			for (size_t i = begin; i < _size; ++i)
 			{
 				_datas[i + shift] = std::move(src[i]);
 			}
 		}
 		else if (shift > 0) {
+
+			if (newSize > _capacity) {
+				_datas = new ElemType[newSize * 2];
+				for (size_t i = 0; i < begin; i++)
+				{
+					_datas[i] = std::move(src[i]);
+				}
+			}
+
 			for (size_t i = _size - 1; i >= begin; --i)
 			{
 				_datas[i + shift] = std::move(src[i]);
 			}
-		}
-		_size = _size + shift;
 
-		if (src != _datas) {
-			delete[] src;
+			if (src != _datas) {
+				delete[] src;
+			}
 		}
+		_size = newSize;
 	}
 
 public:
