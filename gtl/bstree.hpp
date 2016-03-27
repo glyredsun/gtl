@@ -6,6 +6,8 @@
 
 #include <macros.hpp>
 
+#include <functional>
+
 NS_BEGIN(gtl)
 
 template <typename ElemType>
@@ -56,6 +58,11 @@ public:
 	void remove(const ElemType &elem)
 	{	
 		remove(elem, _root);
+	}
+
+	void preorderTraverse(const std::function<void(const ElemType&)> &handler)
+	{
+
 	}
 
 protected:
