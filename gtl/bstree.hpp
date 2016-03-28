@@ -89,8 +89,7 @@ protected:
 
 	bool contain(const ElemType &elem, Node *root)
 	{
-		if (root)
-		{
+		if (root) {
 			if (elem < root->elem)
 				return contain(elem, root->left);
 			else if (root->elem < elem)
@@ -103,17 +102,23 @@ protected:
 
 	Node* findMin(Node *root)
 	{
-		while (root && root->left)
-			root = root->left;
-
+		if (root) {
+			while (root->left) {
+				root = root->left;
+			}
+		}
+		
 		return root;
 	}
 
 	Node* findMax(Node *root)
 	{
-		while (root && root->right)
-			root = root->right;
-
+		if (root) {
+			while (root->right) {
+				root = root->right;
+			}
+		}
+		
 		return root;
 	}
 
