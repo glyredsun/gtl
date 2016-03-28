@@ -5,6 +5,7 @@
 #define _BSTREE_HPP_
 
 #include <macros.hpp>
+#include <algorithm.hpp>
 
 #include <functional>
 
@@ -15,9 +16,40 @@ class bstree
 {
 public:
 
+	bstree()
+	{
+
+	}
+
+	bstree(const bstree &other)
+	{
+		copyFrom(other);
+	}
+
+	bstree(bstree &&other)
+	{
+		moveFrom(other);
+	}
+
 	~bstree()
 	{
 		makeEmpty(_root);
+	}
+
+	bstree& operator = (const bstree &other)
+	{
+		if (this != &other) {
+			copyFrom(other);
+		}
+		return *this;
+	}
+
+	bstree& operator = (bstree &&other)
+	{
+		if (this != &other) {
+			moveFrom(other);
+		}
+		return *this;
 	}
 
 	void insert(const ElemType &elem)
@@ -74,7 +106,7 @@ protected:
 		Node(ElemType &&elem, Node *left = nullptr, Node *right = nullptr) : elem(elem), left(left), right(right) {}
 	};
 
-	void insert(ElemType &&elem, Node* &root)
+	static void insert(ElemType &&elem, Node* &root)
 	{
 		if (root) {
 			if (elem < root->elem)
@@ -87,7 +119,7 @@ protected:
 		}
 	}
 
-	bool contain(const ElemType &elem, Node *root)
+	static bool contain(const ElemType &elem, Node *root) const
 	{
 		if (root) {
 			if (elem < root->elem)
@@ -100,7 +132,7 @@ protected:
 		return false;
 	}
 
-	Node* findMin(Node *root)
+	static Node* findMin(Node *root)
 	{
 		if (root) {
 			while (root->left) {
@@ -111,7 +143,7 @@ protected:
 		return root;
 	}
 
-	Node* findMax(Node *root)
+	static Node* findMax(Node *root)
 	{
 		if (root) {
 			while (root->right) {
@@ -122,7 +154,7 @@ protected:
 		return root;
 	}
 
-	void remove(const ElemType &elem, Node* &root)
+	static void remove(const ElemType &elem, Node* &root)
 	{
 		if (!root)
 			return
@@ -142,7 +174,7 @@ protected:
 		}
 	}
 
-	void makeEmpty(Node* &root)
+	static void makeEmpty(Node* &root)
 	{
 		if (root) {
 			makeEmpty(root->left);
@@ -150,6 +182,29 @@ protected:
 			delete root;
 			root = nullptr;
 		}
+	}
+
+	static Node* clone(Node *root) const
+	{
+		if (root) {
+
+			return new Node(root->elem, clone(root->left), clone(root->right));
+		}
+		return nullptr;
+	}
+
+protected:
+
+	void copyFrom(const bstree &other)
+	{
+		makeEmpty(_root);
+		_root = clone(other._root);
+	}
+
+	void moveFrom(bstree &&other)
+	{
+		makeEmpty(_root);
+		gtl::swap(_root, other._root);
 	}
 
 private:
