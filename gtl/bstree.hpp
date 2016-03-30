@@ -26,9 +26,9 @@ public:
 		copyFrom(other);
 	}
 
-	bstree(bstree &&other)
+	bstree(bstree&& other)
 	{
-		moveFrom(other);
+		moveFrom(std::move(other));
 	}
 
 	~bstree()
@@ -53,11 +53,6 @@ public:
 	}
 
 	void insert(const ElemType &elem)
-	{
-		insert(std::move(ElemType(elem));
-	}
-
-	void insert(ElemType &&elem)
 	{
 		insert(elem, _root);
 	}
@@ -92,9 +87,9 @@ public:
 		remove(elem, _root);
 	}
 
-	void preorderTraverse(const std::function<void(const ElemType&)> &handler)
+	void midorderTraverse(const std::function<void(const ElemType&)> &handler)
 	{
-
+		midorderTraverse(_root, handler);
 	}
 
 protected:
@@ -106,7 +101,7 @@ protected:
 		Node(ElemType &&elem, Node *left = nullptr, Node *right = nullptr) : elem(elem), left(left), right(right) {}
 	};
 
-	static void insert(ElemType &&elem, Node* &root)
+	static void insert(const ElemType &elem, Node* &root)
 	{
 		if (root) {
 			if (elem < root->elem)
@@ -119,7 +114,7 @@ protected:
 		}
 	}
 
-	static bool contain(const ElemType &elem, Node *root) const
+	static bool contain(const ElemType &elem, Node *root)
 	{
 		if (root) {
 			if (elem < root->elem)
@@ -157,7 +152,7 @@ protected:
 	static void remove(const ElemType &elem, Node* &root)
 	{
 		if (!root)
-			return
+			return;
 
 		if (elem < root->elem)
 			remove(elem, root->left);
@@ -184,13 +179,23 @@ protected:
 		}
 	}
 
-	static Node* clone(Node *root) const
+	static Node* clone(Node *root)
 	{
 		if (root) {
 
 			return new Node(root->elem, clone(root->left), clone(root->right));
 		}
 		return nullptr;
+	}
+
+	static void midorderTraverse(Node *root, const std::function<void(const ElemType&)> &handler)
+	{
+		if (root)
+		{
+			midorderTraverse(root->left, handler);
+			handler(root->elem);
+			midorderTraverse(root->right, handler);
+		}
 	}
 
 protected:
