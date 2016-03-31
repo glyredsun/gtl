@@ -20,6 +20,18 @@ void swap(T& left, T& right)
 	right = std::move(tmp);
 }
 
+template <typename T>
+void max(const T& a, const T& b)
+{
+	return a > b ? a : b;
+}
+
+template <typename T>
+void min(const T& a, const T& b)
+{
+	return a < b ? a : b;
+}
+
 NS_END(gtl);
 
 #endif

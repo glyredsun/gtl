@@ -54,7 +54,12 @@ public:
 
 	void insert(const ElemType &elem)
 	{
-		insert(elem, _root);
+		insert(std::move(ElemType(elem)), _root);
+	}
+
+	void insert(ElemType &&elem)
+	{
+		insert(std::move(elem), _root);
 	}
 
 	bool contain(const ElemType &elem)
@@ -97,20 +102,22 @@ protected:
 	struct Node {
 		ElemType elem;
 		Node *left, *right;
-		Node(const ElemType &elem, Node *left = nullptr, Node *right = nullptr) : elem(elem), left(left), right(right) {}
-		Node(ElemType &&elem, Node *left = nullptr, Node *right = nullptr) : elem(elem), left(left), right(right) {}
+		
+		Node(ElemType &&elem, Node *left = nullptr, Node *right = nullptr) : elem(elem), left(left), right(right) {
+			std::cout << __FUNCTION__ << std::endl;
+		}
 	};
 
-	static void insert(const ElemType &elem, Node* &root)
+	static void insert(ElemType &&elem, Node* &root)
 	{
 		if (root) {
 			if (elem < root->elem)
-				insert(elem, root->left);
+				insert(std::move(elem), root->left);
 			else if (root->elem < elem)
-				insert(elem, root->right);
+				insert(std::move(elem), root->right);
 		}
 		else {
-			root = new Node(elem);
+			root = new Node(std::move(elem));
 		}
 	}
 
