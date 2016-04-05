@@ -45,10 +45,16 @@ protected:
 		}
 
 		if (height(t->left) - height(t->right) > ALLOWED_IMBALANCE) {
-
+			if (height(t->left->left) >= height(t->left->right))
+				rotateWithLeftChild(t);
+			else
+				doubleWithLeftChild(t);
 		}
 		else if (height(t->right) - height(t->left) > ALLOWED_IMBALANCE) {
-
+			if (height(t->right->right) >= height(t->right->left))
+				rotateWithRightChild(t);
+			else
+				doubleWithRightChild(t);
 		}
 		
 		root->height = 1 + max(height(root->left), height(root->right));

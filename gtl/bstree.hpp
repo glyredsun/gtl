@@ -97,6 +97,11 @@ public:
 		midorderTraverse(_root, handler);
 	}
 
+	void print()
+	{
+		print(_root, 0);
+	}
+
 protected:
 
 	struct Node {
@@ -203,6 +208,26 @@ protected:
 			handler(root->elem);
 			midorderTraverse(root->right, handler);
 		}
+	}
+
+	static void print(Node *root, int depth)
+	{
+		if (root == nullptr) {
+			std::cout << std::endl;
+			return;
+		}
+		
+		print(root->left, depth + 1);
+		
+
+		for (int i = 0; i < depth; i++)
+		{
+			std::cout << "\t";
+		}
+		std::cout << root->elem;
+		
+		
+		print(root->right, depth + 1);
 	}
 
 protected:
