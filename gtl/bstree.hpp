@@ -47,7 +47,7 @@ public:
 	bstree& operator = (bstree &&other)
 	{
 		if (this != &other) {
-			moveFrom(other);
+			moveFrom(std::move(other));
 		}
 		return *this;
 	}
