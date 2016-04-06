@@ -32,6 +32,11 @@ public:
 		return insert(std::move(elem), _root);
 	}
 
+	void remove(const ElemType &elem)
+	{
+		remove(elem, _root);
+	}
+
 	void makeEmpty()
 	{
 		makeEmpty(_root);
@@ -52,6 +57,24 @@ protected:
 		Node(const ElemType &elem, Node *left = nullptr, Node *right = nullptr, int height = 0) : elem{ elem }, left{ left }, right{ right }, height{ height } { }
 		Node(ElemType &&elem, Node *left = nullptr, Node *right = nullptr, int height = 0) : elem{ std::move(elem) }, left{ left }, right{ right }, height{ height } { }
 	};
+
+	static Node* findMin(Node *t)
+	{
+		if (t)
+			while (t->left)
+				t = t->left;
+
+		return t;
+	}
+
+	static Node* findMax(Node *t)
+	{
+		if (t)
+			while (t->right)
+				t = t->right;
+
+		return t;
+	}
 
 	static void print(Node *t, int depth)
 	{
@@ -94,6 +117,31 @@ protected:
 		
 		balance(t);
 		return ret;
+	}
+
+	static void remove(const ElemType &elem, Node* &t)
+	{
+		if (t == nullptr) {
+			return;
+		}
+
+		if (elem < t->elem)
+			remove(elem, t->left);
+		else if (t->elem < elem)
+			remove(elem, t->right);
+		else if (t->left && t->right)
+		{
+			t->elem = findMin(t->right)->elem;
+			remove(t->elem, t->right);
+		}
+		else
+		{
+			Node *oldNode = t;
+			t = t->left ? t->left : t->right;
+			delete oldNode;
+		}
+
+		balance(t);
 	}
 
 	static void balance(Node* &t)
