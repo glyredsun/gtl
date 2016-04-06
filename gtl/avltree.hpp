@@ -17,14 +17,24 @@ class avltree
 {
 public:
 
-	void insert(const ElemType &elem)
+	~avltree()
 	{
-		insert(std::move(ElemType(elem)), _root);
+		makeEmpty();
 	}
 
-	void insert(ElemType &&elem)
+	bool insert(const ElemType &elem)
 	{
-		insert(std::move(elem), _root);
+		return insert(std::move(ElemType(elem)), _root);
+	}
+
+	bool insert(ElemType &&elem)
+	{
+		return insert(std::move(elem), _root);
+	}
+
+	void makeEmpty()
+	{
+		makeEmpty(_root);
 	}
 
 	void print()
@@ -67,19 +77,23 @@ protected:
 		return root ? root->height : -1;
 	}
 
-	static void insert(ElemType &&elem, Node* &root)
+	static bool insert(ElemType &&elem, Node* &root)
 	{
+		bool ret = false;
+
 		if (root == nullptr) {
 			root = new Node(std::move(elem));
+			ret = true;
 		}
 		else if (elem < root->elem) {
-			insert(std::move(elem), root->left);
+			ret = insert(std::move(elem), root->left);
 		}
 		else if (root->elem < elem) {
-			insert(std::move(elem), root->right);
+			ret = insert(std::move(elem), root->right);
 		}
 		
 		balance(root);
+		return ret;
 	}
 
 	static void balance(Node* &t)
@@ -156,6 +170,18 @@ protected:
 		k2->height = max(k1->height, k3->height) + 1;
 
 		k3 = k2;
+	}
+
+	static void makeEmpty(Node* &t)
+	{
+		if (t == nullptr) {
+			return;
+		}
+
+		makeEmpty(t->left);
+		makeEmpty(t->right);
+		delete t;
+		t = nullptr;
 	}
 
 	static const int ALLOWED_IMBALANCE = 1;
