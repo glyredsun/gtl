@@ -113,121 +113,121 @@ protected:
 		}
 	};
 
-	static void insert(ElemType &&elem, Node* &root)
+	static void insert(ElemType &&elem, Node* &t)
 	{
-		if (root) {
-			if (elem < root->elem)
-				insert(std::move(elem), root->left);
-			else if (root->elem < elem)
-				insert(std::move(elem), root->right);
+		if (t) {
+			if (elem < t->elem)
+				insert(std::move(elem), t->left);
+			else if (t->elem < elem)
+				insert(std::move(elem), t->right);
 		}
 		else {
-			root = new Node(std::move(elem));
+			t = new Node(std::move(elem));
 		}
 	}
 
-	static bool contain(const ElemType &elem, Node *root)
+	static bool contain(const ElemType &elem, Node *t)
 	{
-		if (root) {
-			if (elem < root->elem)
-				return contain(elem, root->left);
-			else if (root->elem < elem)
-				return contain(elem, root->right);
+		if (t) {
+			if (elem < t->elem)
+				return contain(elem, t->left);
+			else if (t->elem < elem)
+				return contain(elem, t->right);
 			else
 				return true;
 		}
 		return false;
 	}
 
-	static Node* findMin(Node *root)
+	static Node* findMin(Node *t)
 	{
-		if (root) {
-			while (root->left) {
-				root = root->left;
+		if (t) {
+			while (t->left) {
+				t = t->left;
 			}
 		}
 		
-		return root;
+		return t;
 	}
 
-	static Node* findMax(Node *root)
+	static Node* findMax(Node *t)
 	{
-		if (root) {
-			while (root->right) {
-				root = root->right;
+		if (t) {
+			while (t->right) {
+				t = t->right;
 			}
 		}
 		
-		return root;
+		return t;
 	}
 
-	static void remove(const ElemType &elem, Node* &root)
+	static void remove(const ElemType &elem, Node* &t)
 	{
-		if (!root)
+		if (!t)
 			return;
 
-		if (elem < root->elem)
-			remove(elem, root->left);
-		else if (root->elem < elem)
-			remove(elem, root->right);
-		else if (root->left && root->right) {
-			root->elem = findMin(root->right)->elem;
-			remove(root->elem, root->right);
+		if (elem < t->elem)
+			remove(elem, t->left);
+		else if (t->elem < elem)
+			remove(elem, t->right);
+		else if (t->left && t->right) {
+			t->elem = findMin(t->right)->elem;
+			remove(t->elem, t->right);
 		}
 		else {
-			Node *old = root;
-			root = root->left ? root->left : root->right;
+			Node *old = t;
+			t = t->left ? t->left : t->right;
 			delete old;
 		}
 	}
 
-	static void makeEmpty(Node* &root)
+	static void makeEmpty(Node* &t)
 	{
-		if (root) {
-			makeEmpty(root->left);
-			makeEmpty(root->right);
-			delete root;
-			root = nullptr;
+		if (t) {
+			makeEmpty(t->left);
+			makeEmpty(t->right);
+			delete t;
+			t = nullptr;
 		}
 	}
 
-	static Node* clone(Node *root)
+	static Node* clone(Node *t)
 	{
-		if (root) {
+		if (t) {
 
-			return new Node(root->elem, clone(root->left), clone(root->right));
+			return new Node(t->elem, clone(t->left), clone(t->right));
 		}
 		return nullptr;
 	}
 
-	static void midorderTraverse(Node *root, const std::function<void(const ElemType&)> &handler)
+	static void midorderTraverse(Node *t, const std::function<void(const ElemType&)> &handler)
 	{
-		if (root)
+		if (t)
 		{
-			midorderTraverse(root->left, handler);
-			handler(root->elem);
-			midorderTraverse(root->right, handler);
+			midorderTraverse(t->left, handler);
+			handler(t->elem);
+			midorderTraverse(t->right, handler);
 		}
 	}
 
-	static void print(Node *root, int depth)
+	static void print(Node *t, int depth)
 	{
-		if (root == nullptr) {
+		if (t == nullptr) {
 			std::cout << std::endl;
 			return;
 		}
 		
-		print(root->left, depth + 1);
+		print(t->left, depth + 1);
 		
 
 		for (int i = 0; i < depth; i++)
 		{
 			std::cout << "\t";
 		}
-		std::cout << root->elem;
+		std::cout << t->elem;
 		
 		
-		print(root->right, depth + 1);
+		print(t->right, depth + 1);
 	}
 
 protected:

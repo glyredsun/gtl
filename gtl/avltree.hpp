@@ -53,46 +53,46 @@ protected:
 		Node(ElemType &&elem, Node *left = nullptr, Node *right = nullptr, int height = 0) : elem{ std::move(elem) }, left{ left }, right{ right }, height{ height } { }
 	};
 
-	static void print(Node *root, int depth)
+	static void print(Node *t, int depth)
 	{
-		if (root == nullptr)
+		if (t == nullptr)
 		{
 			std::cout << std::endl;
 			return;
 		}
 
-		print(root->left, depth + 1);
+		print(t->left, depth + 1);
 
 		for (int i = 0; i < depth; i++)
 		{
 			std::cout << "\t";
 		}
-		std::cout << root->elem;
+		std::cout << t->elem;
 
-		print(root->right, depth + 1);
+		print(t->right, depth + 1);
 	}
 
-	static int height(Node *root)
+	static int height(Node *t)
 	{
-		return root ? root->height : -1;
+		return t ? t->height : -1;
 	}
 
-	static bool insert(ElemType &&elem, Node* &root)
+	static bool insert(ElemType &&elem, Node* &t)
 	{
 		bool ret = false;
 
-		if (root == nullptr) {
-			root = new Node(std::move(elem));
+		if (t == nullptr) {
+			t = new Node(std::move(elem));
 			ret = true;
 		}
-		else if (elem < root->elem) {
-			ret = insert(std::move(elem), root->left);
+		else if (elem < t->elem) {
+			ret = insert(std::move(elem), t->left);
 		}
-		else if (root->elem < elem) {
-			ret = insert(std::move(elem), root->right);
+		else if (t->elem < elem) {
+			ret = insert(std::move(elem), t->right);
 		}
 		
-		balance(root);
+		balance(t);
 		return ret;
 	}
 
