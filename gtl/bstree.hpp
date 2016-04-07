@@ -67,26 +67,6 @@ public:
 		return contain(elem, _root);
 	}
 
-	ElemType& findMin()
-	{
-		return *findMin(_root);
-	}
-
-	const ElemType& findMin() const
-	{
-		return findMin();
-	}
-
-	ElemType& findMax()
-	{
-		return *findMax(_root);
-	}
-
-	const ElemType& findMax() const
-	{
-		return findMax();
-	}
-
 	void remove(const ElemType &elem)
 	{	
 		remove(elem, _root);
