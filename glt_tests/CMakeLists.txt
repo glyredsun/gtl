@@ -21,3 +21,6 @@ include_directories(bstree_test ${gtl_dir})
 
 add_executable(avltree_test avltree_test.cpp)
 include_directories(avltree_test ${gtl_dir})
+
+add_executable(map_test map_test.cpp)
+include_directories(map_test ${gtl_dir})

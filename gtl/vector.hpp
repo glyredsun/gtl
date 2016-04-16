@@ -355,6 +355,7 @@ public:
 
 	void insert(iterator &where, size_t count, const ElemType &data)
 	{
+		shiftElems(where.idx, cout);
 		while (count-- > 0)
 		{
 			insert(where++, std::move(ElemType(data)));
