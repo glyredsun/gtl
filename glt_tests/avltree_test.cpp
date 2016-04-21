@@ -14,16 +14,31 @@ int main(void)
 	for (int i = 1; i <= nodesNum; i++)
 	{
 		n = rnd() % nodesNum;
-		if (!t.insert(n)) {
+		if (t.find(n) != t.end()) {
 			--i;
+		}
+		else {
+			t.insert(n);
 		}
 	}
 
 	t.print();
 
+	std::cout << "iteration" << std::endl;
+	for (gtl::avltree<uint64_t>::iterator itr = t.begin(); itr != t.end(); ++itr)
+	{
+		std::cout << *itr << std::endl;
+	}
+
 	t.remove(n);
 	std::cout << "after remove " << n << std::endl;
 	t.print();
+
+	std::cout << "iteration" << std::endl;
+	for (gtl::avltree<uint64_t>::iterator itr = t.begin(); itr != t.end(); ++itr)
+	{
+		std::cout << *itr << std::endl;
+	}
 
 	t.makeEmpty();
 

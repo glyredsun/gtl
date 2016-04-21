@@ -7,30 +7,36 @@
 
 #include <macros.hpp>
 #include <avltree.hpp>
+#include <utility.hpp>
 
 NS_BEGIN(gtl);
 
 template <typename K, typename V>
-class map
+class map : public avltree<gtl::pair<K, V>>
 {
 public:
-	struct pair
-	{
-		K key;
-		V value;
-		bool operator < (const pair &other) const
-		{
-			return key < other.key;
-		}
-	};
+	typedef gtl::pair<K, V> value_type;
 
-	V& operator [] (const K &key)
+public:
+
+	map()
+		: avltree<value_type>(value_less)
 	{
 
 	}
+	
+	V& operator [] (const K &key)
+	{
+		return insert(value_type{ key, V() })->second;
+	}
 
-protected:
-	avltree<pair> _tree;
+public:
+
+	static bool value_less(const value_type &a, const value_type &b)
+	{
+		return a.first < b.first;
+	}
+
 };
 
 NS_END(gtl);
