@@ -17,9 +17,18 @@ class vector
 {
 public:
 	vector(size_t initSize = 0)
-		: _size{ initSize }
 	{
-		reserve(_size + SPARE_SIZE);
+		reserve(initSize + SPARE_SIZE);
+		_size = initSize;
+	}
+
+	vector(std::initializer_list<ElemType> args)
+		: vector(args.size())
+	{
+		for (size_t i = 0; i < args.size(); ++i)
+		{
+			(*this)[i] = *(args.begin() + i);
+		}
 	}
 
 	~vector()
@@ -187,8 +196,15 @@ public:
 	class iterator
 	{
 		friend class vector;
-	
+		
 	public:
+
+		iterator()
+			: vectPtr(nullptr), idx(0)
+		{
+
+		}
+
 		iterator(vector *v, int idx)
 			: vectPtr(v), idx(idx)
 		{
@@ -238,7 +254,7 @@ public:
 
 		iterator& operator =(const iterator& other)
 		{
-			if (&other !== this)
+			if (&other != this)
 			{
 				this->vectPtr = other.vectPtr;
 				this->idx = other.idx;
