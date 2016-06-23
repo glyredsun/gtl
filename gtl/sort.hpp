@@ -12,6 +12,7 @@ void insertionSort(const Iterator &begin, const Iterator &end, Comparator lessTh
 	for (Iterator p = begin + 1; p != end; ++p)
 	{
 		auto tmp = std::move(*p);
+		int times = 0;
 		for (j = p; j != begin && lessThan(tmp, *(j - 1)); --j)
 		{
 			*j = std::move(*(j - 1));

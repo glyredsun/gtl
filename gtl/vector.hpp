@@ -226,7 +226,7 @@ public:
 
 		iterator& operator --()
 		{
-			++idx;
+			--idx;
 			return *this;
 		}
 
@@ -277,7 +277,12 @@ public:
 			return (*vectPtr)[idx];
 		}
 
-		bool operator == (const iterator& other)
+		const ElemType& operator*() const
+		{
+			return (*vectPtr)[idx];
+		}
+
+		bool operator == (const iterator& other) const
 		{
 			if (&other == this)
 			{
@@ -286,7 +291,7 @@ public:
 			return vectPtr == other.vectPtr && idx == other.idx;
 		}
 
-		bool operator != (const iterator &other)
+		bool operator != (const iterator &other) const
 		{
 			return !(*this == other);
 		}
