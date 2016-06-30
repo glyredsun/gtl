@@ -12,10 +12,6 @@ int main(void)
 {
 	gtl::vector<int> vec{1, 5, 0, 2, 4, 9};
 
-	const gtl::vector<int>::iterator & i1 = vec.begin();
-	const gtl::vector<int>::iterator & i2 = vec.begin();
-	assert(i1 == i2);
-
 	for (size_t i = 0; i < vec.size(); ++i)
 	{
 		if (i) {
