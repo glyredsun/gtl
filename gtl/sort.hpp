@@ -27,5 +27,29 @@ void insertionSort(const Iterator &begin, const Iterator &end)
 	insertionSort(begin, end, [](const decltype(*begin) &first, const decltype(*begin) second) { return first < second; });
 }
 
+template <typename Iterator, typename Comparator>
+void shellSort(const Iterator &begin, const Iterator &end, Comparator lessThan)
+{
+	for (int gap = (end - begin) / 2; gap > 0; gap /= 2)
+	{
+		for (int i = gap; i < end - begin; ++i)
+		{
+			auto tmp = std::move(*(begin + i));
+			int j = i;
+
+			for (; j >= gap && lessThan(tmp, *(begin + j - gap)); j -= gap)
+			{
+				*(begin + j) = std::move(*(begin + j - gap));
+			}
+			*(begin + j) = std::move(tmp);
+		}
+	}
+}
+
+template <typename Iterator>
+void shellSort(const Iterator &begin, const Iterator &end)
+{
+	shellSort(begin, end, [](const decltype(*begin) first, const decltype(*begin) second) { return first < second; });
+}
 
 #endif // !_SORT_HPP_

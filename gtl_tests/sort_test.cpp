@@ -21,8 +21,10 @@ int main(void)
 	}
 	std::cout << std::endl;
 
-	insertionSort(vec.begin(), vec.end(), [](const int &a, const int &b) { return a > b; });
+	//insertionSort(vec.begin(), vec.end(), [](const int &a, const int &b) { return a > b; });
 	//insertionSort(vec.begin(), vec.end());
+
+	shellSort(vec.begin(), vec.end());
 
 	for (size_t i = 0; i < vec.size(); ++i)
 	{
