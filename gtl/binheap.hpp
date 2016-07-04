@@ -23,13 +23,14 @@ public:
 
 	void push(const ElemType & elem)
 	{
-		push(elem, [](const ElemType &a, const ElemType &b) { return a < b; });
+		ElemType copy = elem;
+		push(std::move(copy));
 	}
 
 	void push(const ElemType &elem, const Comparator &lessThan)
 	{
 		ElemType copy = elem;
-		push(std::move(elem), lessThan);
+		push(std::move(copy), lessThan);
 	}
 
 	void push(const ElemType &&elem)
@@ -45,13 +46,14 @@ public:
 		}
 
 		int hole = ++_size;
-		
-		for (; hole > 1 && lessThan(elem, _elems[hole / 2]); hole /= 2)
+		_elems[0] = std::move(elem);
+
+		for (; lessThan(_elems[0], _elems[hole / 2]); hole /= 2)
 		{
 			_elems[hole] = std::move(_elems[hole / 2]);
 		}
 
-		_elems[hole] = std::move(elem);
+		_elems[hole] = std::move(_elems[0]);
 	}
 
 	const vector<ElemType> & container() const
