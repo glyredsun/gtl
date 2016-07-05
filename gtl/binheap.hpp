@@ -11,10 +11,13 @@
 
 NS_BEGIN(gtl)
 
-template <typename ElemType, typename Comparator = std::function<bool (const ElemType &, const ElemType &)>>
+template <typename ElemType>
 class binheap
 {
 public:
+
+	using Comparator = std::function<bool(const ElemType &, const ElemType &)>;
+
 	binheap(int capacity = 64) : _size{ 0 }, _elems{ capacity } {}
 
 	size_t size() { return _size; }
