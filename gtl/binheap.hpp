@@ -71,11 +71,6 @@ public:
 		pop();
 	}
 
-	const vector<ElemType> & container() const
-	{
-		return _elems;
-	}
-
 protected:
 
 	void percolateDown(size_t hole)
