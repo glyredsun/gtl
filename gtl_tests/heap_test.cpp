@@ -19,9 +19,11 @@ int main(void)
 	h.push(24);
 	h.push(436);
 
-	for (size_t i = 0; i < h.size(); ++i)
+	int min;
+	while (!h.empty())
 	{
-		std::cout << h.container()[i + 1] << std::endl;
+		h.pop(min);
+		std::cout << min << std::endl;
 	}
 
 	system("pause");

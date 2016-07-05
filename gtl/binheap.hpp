@@ -59,9 +59,40 @@ public:
 		_elems[hole] = std::move(_elems[0]);
 	}
 
+	void pop()
+	{
+		_elems[1] = std::move(_elems[_size--]);
+		percolateDown(1);
+	}
+
+	void pop(ElemType &min)
+	{
+		min = std::move(_elems[1]);
+		pop();
+	}
+
 	const vector<ElemType> & container() const
 	{
 		return _elems;
+	}
+
+protected:
+
+	void percolateDown(size_t hole)
+	{
+		ElemType tmp = std::move(_elems[hole]);
+		for (size_t child; hole * 2 <= _size; hole = child)
+		{
+			child = hole * 2;
+			if (child != _size && _elems[child + 1] < _elems[child])
+				++child;
+
+			if (_elems[child] < tmp)
+				_elems[hole] = std::move(_elems[child]);
+			else
+				break;
+		}
+		_elems[hole] = tmp;
 	}
 
 private:
