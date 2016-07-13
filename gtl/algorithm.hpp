@@ -32,6 +32,12 @@ const T& min(const T& a, const T& b)
 	return a < b ? a : b;
 }
 
+template <typename Iterator>
+int distance(const Iterator first, const Iterator last)
+{
+	return last - first;
+}
+
 NS_END(gtl);
 
 #endif
