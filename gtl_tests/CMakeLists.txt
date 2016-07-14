@@ -30,3 +30,6 @@ include_directories(map_test ${gtl_dir})
 
 add_executable(sort_test sort_test.cpp)
 include_directories(sort_test ${gtl_dir})
+
+add_executable(string_test string_test.cpp)
+include_directories(string_test ${gtl_dir})

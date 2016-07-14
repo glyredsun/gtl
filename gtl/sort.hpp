@@ -4,6 +4,8 @@
 #include <algorithm.hpp>
 #include <vector.hpp>
 
+#include <thread>
+
 NS_BEGIN(gtl)
 
 template <typename Iterator, typename Comparator>
@@ -107,6 +109,42 @@ template <typename Iterator>
 void mergeSort(Iterator begin, Iterator end)
 {
 	mergeSort(begin, end, [](const decltype(*begin) &left, const decltype(*begin) &right) { return left < right; });
+}
+
+template <typename Iterator, typename Comparator>
+void mergeSortParallel(Iterator begin, Iterator end, const Comparator &lessThan)
+{
+	vector<Iterator::value_type> tmp(distance(begin, end));
+	
+	unsigned threadsNum = std::thread::hardware_concurrency() / 2 * 2;
+	if (threadsNum) {
+		unsigned int count = end - begin;
+		unsigned int countPerThread = count / threadsNum;
+		unsigned int newThreadsNum = threadsNum - 1;
+		unsigned int slices = threadsNum;
+		gtl::vector<std::thread> threadsVec(newThreadsNum);
+		
+		for (unsigned int i = 0; i < slices; ++i)
+		{
+			auto func = [&tmp, =i]() {
+				mergeSort(begin + i * countPerThread, begin + (i + 1) * countPerThread, tmp.begin() + i * countPerThread, lessThan);
+			};
+			if (i < newThreadsNum) {
+				threadsVec[i] = std::move(std::thread(func));
+			}
+			else {
+				func();
+			}
+		}
+		for (std::thread &t : threadsVec)
+		{
+			t.join();
+		}
+
+	}
+	else {
+		mergeSort(begin, end, tmp.begin(), lessThan);
+	}
 }
 
 NS_END(gtl)
