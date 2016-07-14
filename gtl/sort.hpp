@@ -2,7 +2,9 @@
 #define _SORT_HPP_
 
 #include <algorithm.hpp>
-#include <vector>
+#include <vector.hpp>
+
+NS_BEGIN(gtl)
 
 template <typename Iterator, typename Comparator>
 void insertionSort(const Iterator &begin, const Iterator &end, Comparator lessThan)
@@ -97,7 +99,7 @@ void mergeSort(Iterator first, Iterator last, BufIterator bufFirst, Comparator l
 template <typename Iterator, typename Comparator>
 void mergeSort(Iterator first, Iterator last, Comparator lessThan)
 {
-	gtl::vector<Iterator::value_type> tmp(distance(first, last));
+	vector<Iterator::value_type> tmp(distance(first, last));
 	mergeSort(first, last, tmp.begin(), lessThan);
 }
 
@@ -106,5 +108,7 @@ void mergeSort(Iterator first, Iterator last)
 {
 	mergeSort(first, last, [](const decltype(*first) &left, const decltype(*first) &right) { return left < right; });
 }
+
+NS_END(gtl)
 
 #endif // !_SORT_HPP_
