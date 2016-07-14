@@ -1,6 +1,8 @@
-#include "sort.hpp"
 
-#include "vector.hpp"
+#include <sort.hpp>
+#include <vector.hpp>
+
+#include "TimeCounter.hpp"
 
 #include <cstdlib>
 #include <cassert>
@@ -25,32 +27,6 @@ static void printAll(Iterator begin, Iterator end)
 	std::cout << std::endl;
 }
 
-class TimeCounter
-{
-public:
-	using system_clock = std::chrono::system_clock;
-	using time_point = system_clock::time_point;
-
-	TimeCounter()
-	{
-		reset();
-	}
-
-	void reset()
-	{
-		begin = system_clock::now();
-	}
-
-	double count()
-	{
-		auto d = system_clock::now() - begin;
-		return std::chrono::duration < double, std::ratio<1, 1>> (d).count();
-	}
-
-private:
-	time_point begin;
-};
-
 int main(void)
 {
 	const int VEC_LEN = 10000000;
@@ -59,15 +35,15 @@ int main(void)
 	{
 		vec[i] = i;
 	}
-	std::random_device rndDevice;
-	std::mt19937 eng(rndDevice());
-	std::uniform_int_distribution<int> dist(0, VEC_LEN - 1);
-	for (int i = 0; i < VEC_LEN / 2; ++i)
-	{
-		int idx1 = dist(eng);
-		int idx2 = dist(eng);
-		gtl::swap(vec[idx1], vec[idx2]);
-	}
+	//std::random_device rndDevice;
+	//std::mt19937 eng(rndDevice());
+	//std::uniform_int_distribution<int> dist(0, VEC_LEN - 1);
+	//for (int i = 0; i < VEC_LEN / 2; ++i)
+	//{
+	//	int idx1 = dist(eng);
+	//	int idx2 = dist(eng);
+	//	gtl::swap(vec[idx1], vec[idx2]);
+	//}
 
 	TimeCounter tc;
 
@@ -91,7 +67,11 @@ int main(void)
 
 	for (size_t i = 0; i < VEC_LEN; ++i)
 	{
-		assert(vec1[i] == vec2[i] && vec1[i] == vec3[i]);
+		//assert(vec1[i] == vec2[i] && vec1[i] == vec3[i]);
+		if (i) {
+			assert(vec2[i] >= vec2[i - 1]);
+		}
+		assert(vec2[i] == vec3[i]);
 	}
 
 	system("pause");
