@@ -16,6 +16,8 @@ template<typename ElemType>
 class vector
 {
 public:
+	using value_type = ElemType;
+
 	vector(size_t initSize = 0)
 	{
 		reserve(initSize + SPARE_SIZE);
@@ -199,6 +201,8 @@ public:
 		
 	public:
 
+		using value_type = ElemType;
+
 		iterator()
 			: vectPtr(nullptr), idx(0)
 		{
@@ -294,6 +298,16 @@ public:
 		bool operator != (const iterator &other) const
 		{
 			return !(*this == other);
+		}
+
+		bool operator < (const iterator& other) const
+		{
+			return this->idx < other.idx;
+		}
+
+		bool operator <= (const iterator& other) const
+		{
+			return *this < other || *this == other;
 		}
 
 	protected:

@@ -2,7 +2,7 @@
 #define _SORT_HPP_
 
 #include <algorithm.hpp>
-#include <vector.hpp>
+#include <vector>
 
 template <typename Iterator, typename Comparator>
 void insertionSort(const Iterator &begin, const Iterator &end, Comparator lessThan)
@@ -55,42 +55,41 @@ void shellSort(const Iterator &begin, const Iterator &end)
 	shellSort(begin, end, [](const decltype(*begin) first, const decltype(*begin) second) { return first < second; });
 }
 
-template <typename Iterator, typename BufType, typename Comparator>
-void merge(Iterator first, Iterator last, BufType::iterator bufFirst, Comparator lessThan)
+template <typename Iterator, typename BufIterator, typename Comparator>
+void merge(Iterator first, Iterator last, BufIterator bufFirst, Comparator lessThan)
 {
 	int count = gtl::distance(first, last);
 	Iterator left = first;
-	Iterator leftEnd = first + cout / 2;
+	Iterator leftEnd = first + count / 2;
 	Iterator right = leftEnd + 1;
 	Iterator rightEnd = last;
-	Iterator bufCur = bufFirst;
+	BufIterator bufCur = bufFirst;
 
-	while (left <= leftEnd && right <= rightEnd) {
+	while (left <= leftEnd && right <= rightEnd)
 		if (lessThan(*left, *right))
-			*bufCur++ = *left++;
+			*bufCur++ = std::move(*left++);
 		else
-			*bufCur++ = *right++;
-	}
+			*bufCur++ = std::move(*right++);
 
 	while (left <= leftEnd)
-		*bufCur++ = *left++;
+		*bufCur++ = std::move(*left++);
 
 	while (right <= rightEnd)
-		*bufCur++ = *right++;
+		*bufCur++ = std::move(*right++);
 
-
+	while (first < last)
+		*first++ = std::move(*bufFirst++);
 }
 
-template <typename Iterator, typename BufType, typename Comparator>
-void mergetSort(Iterator first, Iterator last, BufType::iterator bufFirst, Comparator lessThan)
+template <typename Iterator, typename BufIterator, typename Comparator>
+void mergeSort(Iterator first, Iterator last, BufIterator bufFirst, Comparator lessThan)
 {
-	if (first < last)
-	{
+	if (first < last) {
 		int count = gtl::distance(first, last);
 		Iterator center = first + count / 2;
-		BufType::iterator bufCenter = bufFirst + count / 2;
-		mergetSort(first, center, bufFirst, lessThan);
-		mergetSort(center + 1, last, bufCenter + 1, lessThan);
+		BufIterator bufCenter = bufFirst + count / 2;
+		mergeSort(first, center, bufFirst, lessThan);
+		mergeSort(center + 1, last, bufCenter + 1, lessThan);
 		merge(first, last, bufFirst, lessThan);
 	}
 }
@@ -98,14 +97,14 @@ void mergetSort(Iterator first, Iterator last, BufType::iterator bufFirst, Compa
 template <typename Iterator, typename Comparator>
 void mergeSort(Iterator first, Iterator last, Comparator lessThan)
 {
-	vector<decltype(*Iterator)> tmp(distance(first, last));
+	gtl::vector<Iterator::value_type> tmp(distance(first, last));
 	mergeSort(first, last, tmp.begin(), lessThan);
 }
 
 template <typename Iterator>
 void mergeSort(Iterator first, Iterator last)
 {
-	mergeSort(first, last, [](const decltype(*Iterator) &left, const decltype(*Iterator) &right) { return *left < *last; });
+	mergeSort(first, last, [](const decltype(*first) &left, const decltype(*first) &right) { return left < right; });
 }
 
 #endif // !_SORT_HPP_

@@ -24,14 +24,27 @@ int main(void)
 	//insertionSort(vec.begin(), vec.end(), [](const int &a, const int &b) { return a > b; });
 	//insertionSort(vec.begin(), vec.end());
 
-	shellSort(vec.begin(), vec.end());
+	gtl::vector<int> vec1 = vec;
+	shellSort(vec1.begin(), vec1.end());
 
-	for (size_t i = 0; i < vec.size(); ++i)
+	for (size_t i = 0; i < vec1.size(); ++i)
 	{
 		if (i) {
 			std::cout << ", ";
 		}
-		std::cout << vec[i];
+		std::cout << vec1[i];
+	}
+	std::cout << std::endl;
+
+	gtl::vector<int> vec2 = vec;
+	mergeSort(vec2.begin(), vec2.end());
+
+	for (size_t i = 0; i < vec2.size(); ++i)
+	{
+		if (i) {
+			std::cout << ", ";
+		}
+		std::cout << vec2[i];
 	}
 	std::cout << std::endl;
 
