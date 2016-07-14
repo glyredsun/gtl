@@ -41,9 +41,10 @@ public:
 		begin = system_clock::now();
 	}
 
-	int64_t count()
+	double count()
 	{
-		return (system_clock::now() - begin).count();
+		auto d = system_clock::now() - begin;
+		return std::chrono::duration < double, std::ratio<1, 1>> (d).count();
 	}
 
 private:
@@ -74,19 +75,19 @@ int main(void)
 	tc.reset();
 	gtl::vector<int> vec3 = vec;
 	gtl::mergeSort(vec3.begin(), vec3.end());
-	std::cout << "merge sort cost " << tc.count() << std::endl;
+	std::cout << "merge sort cost " << tc.count() << "s" << std::endl;
 
 	std::cout << "begin shell sort" << std::endl;
 	tc.reset();
 	gtl::vector<int> vec2 = vec;
 	gtl::shellSort(vec2.begin(), vec2.end());
-	std::cout << "shell sort cost " << tc.count() << std::endl;
+	std::cout << "shell sort cost " << tc.count() << "s" << std::endl;
 	
 	std::cout << "begin insertion sort" << std::endl;
 	tc.reset();
 	gtl::vector<int> vec1 = vec;
 	gtl::insertionSort(vec1.begin(), vec1.end());
-	std::cout << "insertion sort cost " << tc.count() << std::endl;
+	std::cout << "insertion sort cost " << tc.count() << "s" << std::endl;
 
 	for (size_t i = 0; i < VEC_LEN; ++i)
 	{
