@@ -140,7 +140,10 @@ void mergeSortParallel(Iterator begin, Iterator end, const Comparator &lessThan)
 		{
 			t.join();
 		}
+		for (; slices > 0; slices /= 2)
+		{
 
+		}
 	}
 	else {
 		mergeSort(begin, end, tmp.begin(), lessThan);
