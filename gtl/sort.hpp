@@ -58,55 +58,55 @@ void shellSort(const Iterator &begin, const Iterator &end)
 }
 
 template <typename Iterator, typename BufIterator, typename Comparator>
-void merge(Iterator first, Iterator last, BufIterator bufFirst, Comparator lessThan)
+void merge(Iterator begin, Iterator end, BufIterator bufBegin, const Comparator &lessThan)
 {
-	int count = gtl::distance(first, last);
-	Iterator left = first;
-	Iterator leftEnd = first + count / 2;
-	Iterator right = leftEnd + 1;
-	Iterator rightEnd = last;
-	BufIterator bufCur = bufFirst;
+	int count = gtl::distance(begin, end);
+	Iterator left = begin;
+	Iterator leftEnd = begin + count / 2;
+	Iterator right = leftEnd;
+	Iterator rightEnd = end;
+	BufIterator bufCur = bufBegin;
 
-	while (left <= leftEnd && right <= rightEnd)
+	while (left < leftEnd && right < rightEnd)
 		if (lessThan(*left, *right))
 			*bufCur++ = std::move(*left++);
 		else
 			*bufCur++ = std::move(*right++);
 
-	while (left <= leftEnd)
+	while (left < leftEnd)
 		*bufCur++ = std::move(*left++);
 
-	while (right <= rightEnd)
+	while (right < rightEnd)
 		*bufCur++ = std::move(*right++);
 
-	while (first < last)
-		*first++ = std::move(*bufFirst++);
+	while (begin < end)
+		*begin++ = std::move(*bufBegin++);
 }
 
 template <typename Iterator, typename BufIterator, typename Comparator>
-void mergeSort(Iterator first, Iterator last, BufIterator bufFirst, Comparator lessThan)
+void mergeSort(Iterator begin, Iterator end, BufIterator bufBegin, const Comparator &lessThan)
 {
-	if (first < last) {
-		int count = gtl::distance(first, last);
-		Iterator center = first + count / 2;
-		BufIterator bufCenter = bufFirst + count / 2;
-		mergeSort(first, center, bufFirst, lessThan);
-		mergeSort(center + 1, last, bufCenter + 1, lessThan);
-		merge(first, last, bufFirst, lessThan);
+	int count = gtl::distance(begin, end);
+	if (count > 1) {
+		Iterator center = begin + count / 2;
+		BufIterator bufCenter = bufBegin + count / 2;
+		mergeSort(begin, center, bufBegin, lessThan);
+		mergeSort(center, end, bufCenter, lessThan);
+		merge(begin, end, bufBegin, lessThan);
 	}
 }
 
 template <typename Iterator, typename Comparator>
-void mergeSort(Iterator first, Iterator last, Comparator lessThan)
+void mergeSort(Iterator begin, Iterator end, const Comparator &lessThan)
 {
-	vector<Iterator::value_type> tmp(distance(first, last));
-	mergeSort(first, last, tmp.begin(), lessThan);
+	vector<Iterator::value_type> tmp(distance(begin, end));
+	mergeSort(begin, end, tmp.begin(), lessThan);
 }
 
 template <typename Iterator>
-void mergeSort(Iterator first, Iterator last)
+void mergeSort(Iterator begin, Iterator end)
 {
-	mergeSort(first, last, [](const decltype(*first) &left, const decltype(*first) &right) { return left < right; });
+	mergeSort(begin, end, [](const decltype(*begin) &left, const decltype(*begin) &right) { return left < right; });
 }
 
 NS_END(gtl)
