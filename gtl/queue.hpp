@@ -8,6 +8,7 @@
 #include <macros.hpp>
 
 #include <algorithm>
+#include <functional>
 
 NS_BEGIN(gtl)
 
@@ -18,7 +19,7 @@ public:
 
 	queue(size_t capacity = MIN_CAPACITY)
 	{
-		reserve(capacity >= MIN_CAPACITY ? capacity : MIN_CAPACITY);
+		reserve(capacity > MIN_CAPACITY ? capacity : MIN_CAPACITY);
 	}
 
 	~queue()
@@ -111,7 +112,6 @@ protected:
 		duplicate(other._elems, other._front, other._back, other._capacity);
 	}
 
-	
 	void moveFrom(queue &other) {
 
 		freeMemory();
@@ -177,6 +177,18 @@ private:
 	size_t _front{0};
 	size_t _back{0};
 	size_t _capacity{0};
+};
+
+template <typename ElemType>
+class priority_queue
+{
+public:
+	using value_type = ElemType;
+	using comparator_type = std::function<bool (const ElemType&, const ElemType&)>;
+
+	priority_queue() {
+
+	}
 };
 
 NS_END(gtl)

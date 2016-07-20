@@ -114,40 +114,72 @@ void mergeSort(Iterator begin, Iterator end)
 template <typename Iterator, typename Comparator>
 void mergeSortParallel(Iterator begin, Iterator end, const Comparator &lessThan)
 {
-	vector<Iterator::value_type> tmp(distance(begin, end));
+	typedef vector<Iterator::value_type> BufType;
+	BufType tmp(distance(begin, end));
+	BufType::iterator bufBegin = tmp.begin();
+
+	unsigned int threadsNum = std::thread::hardware_concurrency() / 2 * 2;
 	
-	unsigned threadsNum = std::thread::hardware_concurrency() / 2 * 2;
 	if (threadsNum) {
+		unsigned int slices = lastPOT(threadsNum);
 		unsigned int count = end - begin;
-		unsigned int countPerThread = count / threadsNum;
-		unsigned int newThreadsNum = threadsNum - 1;
-		unsigned int slices = threadsNum;
+		unsigned int countPerSlice = count / slices;
+		unsigned int newThreadsNum = slices - 1;
+		
 		gtl::vector<std::thread> threadsVec(newThreadsNum);
 		
 		for (unsigned int i = 0; i < slices; ++i)
 		{
-			auto func = [&tmp, =i]() {
-				mergeSort(begin + i * countPerThread, begin + (i + 1) * countPerThread, tmp.begin() + i * countPerThread, lessThan);
+			auto func = [=]() {
+				mergeSort(begin + i * countPerSlice, begin + (i + 1) * countPerSlice, bufBegin + i * countPerSlice, lessThan);
 			};
 			if (i < newThreadsNum) {
 				threadsVec[i] = std::move(std::thread(func));
-			}
-			else {
+			} else {
 				func();
 			}
 		}
+
 		for (std::thread &t : threadsVec)
 		{
 			t.join();
 		}
-		for (; slices > 0; slices /= 2)
-		{
 
+		while ((slices /= 2) > 0)
+		{
+			countPerSlice = count / slices;
+			newThreadsNum = slices - 1;
+
+			threadsVec.resize(newThreadsNum);
+
+			for (unsigned int i = 0; i < slices; ++i)
+			{
+				auto func = [=]() {
+					merge(begin + i * countPerSlice, begin + (i + 1) * countPerSlice, bufBegin + i * countPerSlice, lessThan);
+				};
+				if (i < newThreadsNum) {
+					threadsVec[i] = std::move(std::thread(func));
+				}
+				else {
+					func();
+				}
+			}
+
+			for (std::thread &t : threadsVec)
+			{
+				t.join();
+			}
 		}
 	}
 	else {
 		mergeSort(begin, end, tmp.begin(), lessThan);
 	}
+}
+
+template <typename Iterator>
+void mergeSortParallel(Iterator begin, Iterator end)
+{
+	mergeSortParallel(begin, end, [](const decltype(*begin) &left, const decltype(*begin) &right) { return left < right; });
 }
 
 NS_END(gtl)
