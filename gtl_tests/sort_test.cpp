@@ -35,35 +35,41 @@ int main(void)
 	{
 		vec[i] = i;
 	}
-	//std::random_device rndDevice;
-	//std::mt19937 eng(rndDevice());
-	//std::uniform_int_distribution<int> dist(0, VEC_LEN - 1);
-	//for (int i = 0; i < VEC_LEN / 2; ++i)
-	//{
-	//	int idx1 = dist(eng);
-	//	int idx2 = dist(eng);
-	//	gtl::swap(vec[idx1], vec[idx2]);
-	//}
+	std::random_device rndDevice;
+	std::mt19937 eng(rndDevice());
+	std::uniform_int_distribution<int> dist(0, VEC_LEN - 1);
+	for (int i = 0; i < VEC_LEN / 2; ++i)
+	{
+		int idx1 = dist(eng);
+		int idx2 = dist(eng);
+		gtl::swap(vec[idx1], vec[idx2]);
+	}
 
 	TimeCounter tc;
 
+	gtl::vector<int> vec4 = vec;
+	std::cout << "begin parallelize merge sort" << std::endl;
+	tc.reset();
+	gtl::mergeSortParallel(vec4.begin(), vec4.end());
+	std::cout << "parallelize merge sort cost " << tc.count() << "s" << std::endl;
+
+	gtl::vector<int> vec3 = vec;
 	std::cout << "begin merge sort" << std::endl;
 	tc.reset();
-	gtl::vector<int> vec3 = vec;
 	gtl::mergeSort(vec3.begin(), vec3.end());
 	std::cout << "merge sort cost " << tc.count() << "s" << std::endl;
 
+	gtl::vector<int> vec2 = vec;
 	std::cout << "begin shell sort" << std::endl;
 	tc.reset();
-	gtl::vector<int> vec2 = vec;
 	gtl::shellSort(vec2.begin(), vec2.end());
 	std::cout << "shell sort cost " << tc.count() << "s" << std::endl;
 	
-	std::cout << "begin insertion sort" << std::endl;
-	tc.reset();
-	gtl::vector<int> vec1 = vec;
-	gtl::insertionSort(vec1.begin(), vec1.end());
-	std::cout << "insertion sort cost " << tc.count() << "s" << std::endl;
+	//gtl::vector<int> vec1 = vec;
+	//std::cout << "begin insertion sort" << std::endl;
+	//tc.reset();
+	//gtl::insertionSort(vec1.begin(), vec1.end());
+	//std::cout << "insertion sort cost " << tc.count() << "s" << std::endl;
 
 	for (size_t i = 0; i < VEC_LEN; ++i)
 	{
@@ -71,7 +77,7 @@ int main(void)
 		if (i) {
 			assert(vec2[i] >= vec2[i - 1]);
 		}
-		assert(vec2[i] == vec3[i]);
+		assert(vec2[i] == vec3[i] && vec3[i] == vec4[i]);
 	}
 
 	system("pause");
