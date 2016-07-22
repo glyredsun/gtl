@@ -1,6 +1,7 @@
 
 #include <sort.hpp>
 #include <vector.hpp>
+#include <algorithm.hpp>
 
 #include "TimeCounter.hpp"
 
@@ -79,6 +80,10 @@ int main(void)
 		}
 		assert(vec2[i] == vec3[i] && vec3[i] == vec4[i]);
 	}
+
+	gtl::vector<int>::iterator result = gtl::search(vec4.begin(), vec4.end(), 5999);
+	assert(result != vec4.end());
+	std::cout << "search result " << *result << std::endl;
 
 	system("pause");
 

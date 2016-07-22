@@ -12,8 +12,32 @@
 
 NS_BEGIN(gtl);
 
+template <typename Iterator, typename DataType, typename Comparator>
+inline Iterator search(Iterator begin, Iterator end, const DataType &target, Comparator &lessThan)
+{
+	Iterator middle;
+	while (begin < end) {
+		middle = begin + (end - begin)/2;
+		if (lessThan(*middle, target)) {
+			begin = middle;
+		} else if (lessThan(target, *middle)) {
+			end = middle;
+		} else {
+			return middle;
+		}
+	}
+
+	return end;
+}
+
+template <typename Iterator, typename DataType>
+inline Iterator search(Iterator begin, Iterator end, const DataType &target)
+{
+	return search(begin, end, target, gtl::less<Iterator::value_type>());
+}
+
 template <typename T>
-T nextPOT(T num)
+inline T nextPOT(T num)
 {
 	for (size_t i = 1; i <= sizeof(T) * 8 / 2; i *= 2)
 	{
@@ -23,13 +47,13 @@ T nextPOT(T num)
 }
 
 template <typename T>
-T lastPOT(T num)
+inline T lastPOT(T num)
 {
 	return nextPOT(num) >> 1;
 }
 
 template <typename T>
-void swap(T& left, T& right)
+inline void swap(T& left, T& right)
 {
 	T tmp = std::move(left);
 	left = std::move(right);
@@ -37,19 +61,19 @@ void swap(T& left, T& right)
 }
 
 template <typename T>
-const T& max(const T& a, const T& b)
+inline const T& max(const T& a, const T& b)
 {
 	return a > b ? a : b;
 }
 
 template <typename T>
-const T& min(const T& a, const T& b)
+inline const T& min(const T& a, const T& b)
 {
 	return a < b ? a : b;
 }
 
 template <typename Iterator>
-int distance(const Iterator first, const Iterator last)
+inline int distance(const Iterator first, const Iterator last)
 {
 	return last - first;
 }
