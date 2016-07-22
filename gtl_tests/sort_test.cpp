@@ -85,6 +85,9 @@ int main(void)
 	assert(result != vec4.end());
 	std::cout << "search result " << *result << std::endl;
 
+	result = gtl::search(vec4.begin(), vec4.end(), -1);
+	assert(result == vec4.end());
+
 	system("pause");
 
 	return EXIT_SUCCESS;

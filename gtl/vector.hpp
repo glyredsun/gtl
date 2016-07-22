@@ -215,6 +215,12 @@ public:
 
 		}
 
+		iterator(const iterator &other)
+			: vectPtr(other.vectPtr), idx(other.idx)
+		{
+			int a = 0;
+		}
+
 		iterator& operator ++()
 		{
 			++idx;

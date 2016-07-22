@@ -12,10 +12,13 @@
 
 NS_BEGIN(gtl);
 
+// binary search
 template <typename Iterator, typename DataType, typename Comparator>
 inline Iterator search(Iterator begin, Iterator end, const DataType &target, Comparator &lessThan)
 {
+	Iterator endCopy = end;
 	Iterator middle;
+
 	while (begin < end) {
 		middle = begin + (end - begin)/2;
 		if (lessThan(*middle, target)) {
@@ -27,7 +30,7 @@ inline Iterator search(Iterator begin, Iterator end, const DataType &target, Com
 		}
 	}
 
-	return end;
+	return endCopy;
 }
 
 template <typename Iterator, typename DataType>
@@ -36,6 +39,7 @@ inline Iterator search(Iterator begin, Iterator end, const DataType &target)
 	return search(begin, end, target, gtl::less<Iterator::value_type>());
 }
 
+// get the power of two number big than num
 template <typename T>
 inline T nextPOT(T num)
 {
@@ -46,6 +50,7 @@ inline T nextPOT(T num)
 	return num + 1;
 }
 
+// get the power of two number not big than num
 template <typename T>
 inline T lastPOT(T num)
 {
