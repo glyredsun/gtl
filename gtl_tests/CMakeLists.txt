@@ -33,3 +33,6 @@ include_directories(sort_test ${gtl_dir})
 
 add_executable(string_test string_test.cpp)
 include_directories(string_test ${gtl_dir})
+
+add_executable(hash_test hash_test.cpp)
+include_directories(hash_test ${gtl_dir})

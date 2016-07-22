@@ -19,8 +19,7 @@ public:
 
 public:
 
-	map()
-		: avltree<value_type>(value_less)
+	map() : avltree<value_type>(value_less)
 	{
 
 	}
