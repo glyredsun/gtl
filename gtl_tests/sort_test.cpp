@@ -11,6 +11,7 @@
 #include <iostream>
 #include <chrono>
 #include <random>
+#include <algorithm>
 
 template <typename Iterator>
 static void printAll(Iterator begin, Iterator end)

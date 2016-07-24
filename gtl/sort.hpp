@@ -121,6 +121,7 @@ void mergeSortParallel(Iterator begin, Iterator end, const Comparator &lessThan)
 	unsigned int threadsNum = std::thread::hardware_concurrency() / 2 * 2;
 	
 	if (threadsNum) {
+
 		unsigned int slices = lastPOT(threadsNum);
 		unsigned int count = end - begin;
 		unsigned int countPerSlice = count / slices;
@@ -128,23 +129,28 @@ void mergeSortParallel(Iterator begin, Iterator end, const Comparator &lessThan)
 		
 		gtl::vector<std::thread> threadsVec(newThreadsNum);
 		
+		// merge sort little slices in every thread
 		for (unsigned int i = 0; i < slices; ++i)
 		{
 			auto func = [=]() {
 				mergeSort(begin + i * countPerSlice, begin + (i + 1) * countPerSlice, bufBegin + i * countPerSlice, lessThan);
 			};
 			if (i < newThreadsNum) {
+				// do work in new thread
 				threadsVec[i] = std::move(std::thread(func));
 			} else {
+				// do work in current thread
 				func();
 			}
 		}
 
+		// wait for every new thread done work
 		for (std::thread &t : threadsVec)
 		{
 			t.join();
 		}
 
+		// merge little slice to twice one
 		while ((slices /= 2) > 0)
 		{
 			countPerSlice = count / slices;

@@ -7,10 +7,30 @@
 
 #include <macros.hpp>
 
-
 #include <algorithm>
+#include <cstdlib>
 
 NS_BEGIN(gtl);
+
+#define _MOVE_FUNC_FOR_PRIMARY_TYPE(type)								\
+template <>																\
+inline void move<type *>(type *inBegin, type *inEnd, type *outBegin)	\
+{																		\
+	::_memccpy(outBegin, inBegin, sizeof(type), inEnd - inBegin);		\
+}
+
+template <typename Iterator>
+inline void move(Iterator inBegin, Iterator inEnd, Iterator outBegin)
+{
+	while (inBegin < inEnd)
+		outBegin++ = inBegin++;
+}
+
+_MOVE_FUNC_FOR_PRIMARY_TYPE(char);
+_MOVE_FUNC_FOR_PRIMARY_TYPE(int);
+_MOVE_FUNC_FOR_PRIMARY_TYPE(float);
+_MOVE_FUNC_FOR_PRIMARY_TYPE(double);
+_MOVE_FUNC_FOR_PRIMARY_TYPE(short);
 
 // binary search
 template <typename Iterator, typename DataType, typename Comparator>
