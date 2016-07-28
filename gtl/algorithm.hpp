@@ -60,9 +60,12 @@ inline T lastPOT(T num)
 template <typename T>
 inline void swap(T& left, T& right)
 {
-	T tmp = std::move(left);
-	left = std::move(right);
-	right = std::move(tmp);
+	if (&left != &right)
+	{
+		T tmp = std::move(left);
+		left = std::move(right);
+		right = std::move(tmp);
+	}
 }
 
 template <typename T>
