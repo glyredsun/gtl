@@ -20,10 +20,17 @@ inline void move<type *>(type *inBegin, type *inEnd, type *outBegin)	\
 }
 
 template <typename Iterator>
-inline void move(Iterator inBegin, Iterator inEnd, Iterator outBegin)
+inline void move(Iterator srcBegin, Iterator srcEnd, Iterator destBegin)
 {
-	while (inBegin < inEnd)
-		outBegin++ = inBegin++;
+	while (srcBegin < srcEnd)
+		*destBegin++ = *srcBegin++;
+}
+
+template <typename Iterator>
+inline void move(Iterator srcBegin, Iterator srcEnd, Iterator destBegin, Iterator destEnd)
+{
+	while (srcBegin < srcEnd && destBegin < destEnd)
+		*destBegin++ = *srcBegin++;
 }
 
 _MOVE_FUNC_FOR_PRIMARY_TYPE(char);

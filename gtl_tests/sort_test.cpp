@@ -4,14 +4,13 @@
 #include <algorithm.hpp>
 
 #include "TimeCounter.hpp"
-
+#include "type_traits.hpp"
 #include <cstdlib>
 #include <cassert>
 
 #include <iostream>
 #include <chrono>
 #include <random>
-#include <algorithm>
 
 template <typename Iterator>
 static void printAll(Iterator begin, Iterator end)
