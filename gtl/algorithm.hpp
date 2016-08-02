@@ -6,9 +6,11 @@
 #define ALGORITHMS_HPP_
 
 #include <macros.hpp>
+#include <algorithm.hpp>
+#include <type_traits.hpp>
 
-#include <algorithm>
 #include <cstdlib>
+#include <algorithm>
 
 NS_BEGIN(gtl);
 
@@ -89,9 +91,9 @@ inline void swap(T& left, T& right)
 {
 	if (&left != &right)
 	{
-		T tmp = std::move(left);
-		left = std::move(right);
-		right = std::move(tmp);
+		T tmp = gtl::move(left);
+		left = gtl::move(right);
+		right = gtl::move(tmp);
 	}
 }
 

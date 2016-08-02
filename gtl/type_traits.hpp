@@ -9,7 +9,7 @@
 NS_BEGIN(gtl)
 
 template <typename Type>
-struct remove_reference<Type>
+struct remove_reference
 {
 	using type = Type;
 };
@@ -27,7 +27,7 @@ struct remove_reference<Type&&>
 };
 
 template <typename Type>
-inline remove_reference<Type>::type move(Type&& value)
+constexpr inline typename remove_reference<Type>::type&& move(Type&& value)
 {
 	return static_cast<typename remove_reference<Type>::type&&>(value);
 }

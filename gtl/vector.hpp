@@ -100,7 +100,7 @@ public:
 
 		for (size_t i = 0; i < _size; i++)
 		{
-			newDatas[i] = std::move(_datas[i]);
+			newDatas[i] = gtl::move(_datas[i]);
 		}
 
 		_capacity = newCapacity;
@@ -118,7 +118,7 @@ public:
 
 	void push_back(const ElemType& data) {
 		ElemType copy = data;
-		push_back(std::move(copy));
+		push_back(gtl::move(copy));
 	}
 
 	void clear() {
@@ -163,13 +163,13 @@ protected:
 	void shiftElems(size_t begin, int shift)
 	{
 		ElemType *src = _datas;
-		int newSize = _size + shift;
+		size_t newSize = _size + shift;
 
 		if (shift < 0) {
 
 			for (size_t i = begin; i < _size; ++i)
 			{
-				_datas[i + shift] = std::move(src[i]);
+				_datas[i + shift] = gtl::move(src[i]);
 			}
 		}
 		else if (shift > 0) {
@@ -178,13 +178,13 @@ protected:
 				_datas = new ElemType[newSize * 2];
 				for (size_t i = 0; i < begin; i++)
 				{
-					_datas[i] = std::move(src[i]);
+					_datas[i] = gtl::move(src[i]);
 				}
 			}
 
 			for (size_t i = _size - 1; i >= begin; --i)
 			{
-				_datas[i + shift] = std::move(src[i]);
+				_datas[i + shift] = gtl::move(src[i]);
 			}
 
 			if (src != _datas) {
@@ -391,15 +391,15 @@ public:
 
 	void insert(const iterator &where, const ElemType &data)
 	{
-		insert(where, std::move(ElemType(data)));
+		insert(where, gtl::move(ElemType(data)));
 	}
 
 	void insert(iterator &where, size_t count, const ElemType &data)
 	{
-		shiftElems(where.idx, cout);
+		shiftElems(where.idx, count);
 		while (count-- > 0)
 		{
-			insert(where++, std::move(ElemType(data)));
+			insert(where++, gtl::move(ElemType(data)));
 		}
 	}
 
@@ -408,7 +408,7 @@ public:
 
 		for (std::initializer_list<ElemType>::iterator itr = list.begin(); itr < list.end(); ++itr)
 		{
-			insert(where++, std::move(*itr));
+			insert(where++, gtl::move(*itr));
 		}
 	}
 

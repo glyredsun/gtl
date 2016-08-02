@@ -30,7 +30,7 @@ public:
 	}
 
 	stack(stack&& other)
-		: _container(std::move(other._container))
+		: _container(gtl::move(other._container))
 	{
 	}
 
@@ -47,7 +47,7 @@ public:
 	{
 		if (this != &other)
 		{
-			_container = std::move(other._container);
+			_container = gtl::move(other._container);
 		}
 		return *this;
 	}
@@ -55,7 +55,7 @@ public:
 
 	void push(const T &elem) {
 		T copy = elem;
-		push(std::move(copy));
+		push(gtl::move(copy));
 	}
 
 	void push(T &&elem) {

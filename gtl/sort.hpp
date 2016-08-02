@@ -19,12 +19,12 @@ void insertionSort(const Iterator &begin, const Iterator &end, Comparator lessTh
 
 	for (Iterator p = begin + 1; p != end; ++p)
 	{
-		auto tmp = std::move(*p);
+		auto tmp = gtl::move(*p);
 		for (j = p; j != begin && lessThan(tmp, *(j - 1)); --j)
 		{
-			*j = std::move(*(j - 1));
+			*j = gtl::move(*(j - 1));
 		}
-		*j = std::move(tmp);
+		*j = gtl::move(tmp);
 	}
 }
 
@@ -41,14 +41,14 @@ void shellSort(const Iterator &begin, const Iterator &end, Comparator lessThan)
 	{
 		for (int i = gap; i < end - begin; ++i)
 		{
-			auto tmp = std::move(*(begin + i));
+			auto tmp = gtl::move(*(begin + i));
 			int j = i;
 
 			for (; j >= gap && lessThan(tmp, *(begin + j - gap)); j -= gap)
 			{
-				*(begin + j) = std::move(*(begin + j - gap));
+				*(begin + j) = gtl::move(*(begin + j - gap));
 			}
-			*(begin + j) = std::move(tmp);
+			*(begin + j) = gtl::move(tmp);
 		}
 	}
 }
@@ -71,18 +71,18 @@ void merge(Iterator begin, Iterator end, BufIterator bufBegin, const Comparator 
 
 	while (left < leftEnd && right < rightEnd)
 		if (lessThan(*left, *right))
-			*bufCur++ = std::move(*left++);
+			*bufCur++ = gtl::move(*left++);
 		else
-			*bufCur++ = std::move(*right++);
+			*bufCur++ = gtl::move(*right++);
 
 	while (left < leftEnd)
-		*bufCur++ = std::move(*left++);
+		*bufCur++ = gtl::move(*left++);
 
 	while (right < rightEnd)
-		*bufCur++ = std::move(*right++);
+		*bufCur++ = gtl::move(*right++);
 
 	while (begin < end)
-		*begin++ = std::move(*bufBegin++);
+		*begin++ = gtl::move(*bufBegin++);
 }
 
 template <typename Iterator, typename BufIterator, typename Comparator>
@@ -137,7 +137,7 @@ void mergeSortParallel(Iterator begin, Iterator end, const Comparator &lessThan)
 			};
 			if (i < newThreadsNum) {
 				// do work in new thread
-				threadsVec[i] = std::move(std::thread(func));
+				threadsVec[i] = gtl::move(std::thread(func));
 			} else {
 				// do work in current thread
 				func();
@@ -164,7 +164,7 @@ void mergeSortParallel(Iterator begin, Iterator end, const Comparator &lessThan)
 					merge(begin + i * countPerSlice, begin + (i + 1) * countPerSlice, bufBegin + i * countPerSlice, lessThan);
 				};
 				if (i < newThreadsNum) {
-					threadsVec[i] = std::move(std::thread(func));
+					threadsVec[i] = gtl::move(std::thread(func));
 				}
 				else {
 					func();

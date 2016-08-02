@@ -5,6 +5,7 @@
 #define _BSTREE_HPP_
 
 #include <macros.hpp>
+#include <type_traits.hpp>
 #include <algorithm.hpp>
 
 #include <functional>
@@ -28,7 +29,7 @@ public:
 
 	bstree(bstree&& other)
 	{
-		moveFrom(std::move(other));
+		moveFrom(gtl::move(other));
 	}
 
 	~bstree()
@@ -47,19 +48,19 @@ public:
 	bstree& operator = (bstree &&other)
 	{
 		if (this != &other) {
-			moveFrom(std::move(other));
+			moveFrom(gtl::move(other));
 		}
 		return *this;
 	}
 
 	void insert(const ElemType &elem)
 	{
-		insert(std::move(ElemType(elem)), _root);
+		insert(gtl::move(ElemType(elem)), _root);
 	}
 
 	void insert(ElemType &&elem)
 	{
-		insert(std::move(elem), _root);
+		insert(gtl::move(elem), _root);
 	}
 
 	bool contain(const ElemType &elem)
@@ -97,12 +98,12 @@ protected:
 	{
 		if (t) {
 			if (elem < t->elem)
-				insert(std::move(elem), t->left);
+				insert(gtl::move(elem), t->left);
 			else if (t->elem < elem)
-				insert(std::move(elem), t->right);
+				insert(gtl::move(elem), t->right);
 		}
 		else {
-			t = new Node(std::move(elem));
+			t = new Node(gtl::move(elem));
 		}
 	}
 

@@ -43,12 +43,12 @@ public:
 
 	iterator insert(const ElemType &elem)
 	{
-		return iterator(insert(std::move(ElemType(elem)), _root, _less));
+		return iterator(insert(gtl::move(ElemType(elem)), _root, _less));
 	}
 
 	iterator insert(ElemType &&elem)
 	{
-		return iterator(insert(std::move(elem), _root, _less));
+		return iterator(insert(gtl::move(elem), _root, _less));
 	}
 
 	iterator find(const ElemType &elem)
@@ -79,7 +79,7 @@ protected:
 		Node *left, *right, *parent;
 		int height;
 		Node(const ElemType &elem, Node *parent = nullptr, Node *left = nullptr, Node *right = nullptr, int height = 0) : elem{ elem }, parent{ parent }, left{ left }, right{ right },  height{ height } { }
-		Node(ElemType &&elem, Node *parent = nullptr, Node *left = nullptr, Node *right = nullptr, int height = 0) : elem{ std::move(elem) }, parent{ parent }, left{ left }, right{ right }, height{ height } { }
+		Node(ElemType &&elem, Node *parent = nullptr, Node *left = nullptr, Node *right = nullptr, int height = 0) : elem{ gtl::move(elem) }, parent{ parent }, left{ left }, right{ right }, height{ height } { }
 	};
 
 	static Node* findMin(Node *t)
@@ -149,22 +149,22 @@ protected:
 		Node *ret = nullptr;
 
 		if (t == nullptr) {
-			t = new Node(std::move(elem));
+			t = new Node(gtl::move(elem));
 			ret = t;
 		}
 		else if (less(elem, t->elem)) {
 			if (t->left)
-				ret = insert(std::move(elem), t->left, less);
+				ret = insert(gtl::move(elem), t->left, less);
 			else {
-				t->left = new Node(std::move(elem), t);
+				t->left = new Node(gtl::move(elem), t);
 				ret = t->left;
 			}
 		}
 		else if (less(t->elem, elem)) {
 			if (t->right)
-				ret = insert(std::move(elem), t->right, less);
+				ret = insert(gtl::move(elem), t->right, less);
 			else {
-				t->right = new Node(std::move(elem), t);
+				t->right = new Node(gtl::move(elem), t);
 				ret = t->right;
 			}
 		}

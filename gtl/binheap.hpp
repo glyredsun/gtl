@@ -27,18 +27,18 @@ public:
 	void push(const ElemType & elem)
 	{
 		ElemType copy = elem;
-		push(std::move(copy));
+		push(gtl::move(copy));
 	}
 
 	void push(const ElemType &elem, const Comparator &lessThan)
 	{
 		ElemType copy = elem;
-		push(std::move(copy), lessThan);
+		push(gtl::move(copy), lessThan);
 	}
 
 	void push(const ElemType &&elem)
 	{
-		push(std::move(elem), [](const ElemType &a, const ElemType &b) { return a < b; });
+		push(gtl::move(elem), [](const ElemType &a, const ElemType &b) { return a < b; });
 	}
 
 	void push(const ElemType &&elem, const Comparator &lessThan)
@@ -49,25 +49,25 @@ public:
 		}
 
 		int hole = ++_size;
-		_elems[0] = std::move(elem);
+		_elems[0] = gtl::move(elem);
 
 		for (; lessThan(_elems[0], _elems[hole / 2]); hole /= 2)
 		{
-			_elems[hole] = std::move(_elems[hole / 2]);
+			_elems[hole] = gtl::move(_elems[hole / 2]);
 		}
 
-		_elems[hole] = std::move(_elems[0]);
+		_elems[hole] = gtl::move(_elems[0]);
 	}
 
 	void pop()
 	{
-		_elems[1] = std::move(_elems[_size--]);
+		_elems[1] = gtl::move(_elems[_size--]);
 		percolateDown(1);
 	}
 
 	void pop(ElemType &min)
 	{
-		min = std::move(_elems[1]);
+		min = gtl::move(_elems[1]);
 		pop();
 	}
 
@@ -75,7 +75,7 @@ protected:
 
 	void percolateDown(size_t hole)
 	{
-		ElemType tmp = std::move(_elems[hole]);
+		ElemType tmp = gtl::move(_elems[hole]);
 		for (size_t child; hole * 2 <= _size; hole = child)
 		{
 			child = hole * 2;
@@ -83,7 +83,7 @@ protected:
 				++child;
 
 			if (_elems[child] < tmp)
-				_elems[hole] = std::move(_elems[child]);
+				_elems[hole] = gtl::move(_elems[child]);
 			else
 				break;
 		}

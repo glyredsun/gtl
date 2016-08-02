@@ -6,6 +6,7 @@
 #define _LIST_HPP_
 
 #include <macros.hpp>
+#include <type_traits.hpp>
 
 #include <initializer_list>
 
@@ -324,7 +325,7 @@ public:
 	}
 
 	void insert(const iterator &where, const ElemType &elem) {
-		insert(where, std::move(ElemType(elem)));
+		insert(where, gtl::move(ElemType(elem)));
 	}
 
 	void insert(const iterator &where, size_t count, const ElemType &elem) {
@@ -338,7 +339,7 @@ public:
 	{
 		for (const ElemType &elem : list)
 		{
-			insert(where, std::move(elem));
+			insert(where, gtl::move(elem));
 		}
 	}
 
