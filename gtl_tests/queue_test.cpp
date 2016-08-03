@@ -51,6 +51,22 @@ int main(void)
 	printf("-------------------------------------------------------------\n");
 
 	q.clear();
+	
+	gtl::priority_queue<int> pq;
+
+	pq.push(11);
+	pq.push(423);
+	pq.push(1);
+	pq.push(42);
+	pq.push(31);
+	pq.push(892);
+	pq.push(19);
+
+	std::cout << "pq content" << std::endl;
+	while (!pq.empty()) {
+		std::cout << pq.top() << std::endl;
+		pq.pop();
+	}
 
 	system("pause");
 	

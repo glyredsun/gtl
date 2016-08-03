@@ -30,6 +30,13 @@ public:
 		gtl::move(args.begin(), args.end(), _datas, _datas + _size);
 	}
 
+	template <typename Iterator>
+	vector(Iterator inBegin, Iterator inEnd)
+		: vector(inEnd - inBegin)
+	{
+		gtl::move(inBegin, inEnd, _datas);
+	}
+
 	~vector()
 	{
 		freeMomery();
@@ -118,6 +125,10 @@ public:
 		push_back(gtl::move(copy));
 	}
 
+	void pop_back() {
+		--_size;
+	}
+
 	void clear() {
 		_size = 0;
 	}
@@ -192,74 +203,71 @@ protected:
 	}
 
 public:
-	class iterator
+	class const_iterator
 	{
-		friend class vector;
-		
 	public:
 
 		using value_type = ElemType;
 
-		iterator()
+		const_iterator()
 			: vectPtr(nullptr), idx(0)
 		{
 
 		}
 
-		iterator(vector *v, int idx)
+		const_iterator(vector *v, int idx)
 			: vectPtr(v), idx(idx)
 		{
 
 		}
 
-		iterator(const iterator &other)
+		const_iterator(const const_iterator &other)
 			: vectPtr(other.vectPtr), idx(other.idx)
 		{
-			int a = 0;
 		}
 
-		iterator& operator ++()
+		const_iterator& operator ++()
 		{
 			++idx;
 			return *this;
 		}
 
-		iterator operator ++(int)
+		const_iterator operator ++(int)
 		{
 			iterator copy = *this;
 			++*this;
 			return copy;
 		}
 
-		iterator& operator --()
+		const_iterator& operator --()
 		{
 			--idx;
 			return *this;
 		}
 
-		iterator operator --(int)
+		const_iterator operator --(int)
 		{
 			iterator copy = *this;
 			--*this;
 			return copy;
 		}
 
-		iterator operator +(int offset) const
+		const_iterator operator +(int offset) const
 		{
 			return iterator(vectPtr, idx + offset);
 		}
 
-		iterator operator -(int offset) const
+		const_iterator operator -(int offset) const
 		{
 			return *this + (-offset);
 		}
 
-		int operator -(const iterator &right) const
+		int operator -(const const_iterator &right) const
 		{
 			return idx - right.idx;
 		}
 
-		iterator& operator =(const iterator& other)
+		const_iterator& operator =(const const_iterator& other)
 		{
 			if (&other != this)
 			{
@@ -269,12 +277,68 @@ public:
 			return *this;
 		}
 
-		ElemType* operator ->()
+		const ElemType* operator ->() const
 		{
 			return &(*vectPtr)[idx];
 		}
 
-		const ElemType* operator ->() const
+		const ElemType& operator*() const
+		{
+			return (*vectPtr)[idx];
+		}
+
+		bool operator == (const const_iterator& other) const
+		{
+			if (&other == this)
+			{
+				return true;
+			}
+			return vectPtr == other.vectPtr && idx == other.idx;
+		}
+
+		bool operator != (const const_iterator &other) const
+		{
+			return !(*this == other);
+		}
+
+		bool operator < (const const_iterator& other) const
+		{
+			return this->idx < other.idx;
+		}
+
+		bool operator <= (const const_iterator& other) const
+		{
+			return *this < other || *this == other;
+		}
+
+	protected:
+		vector *vectPtr;
+		int idx;
+	};
+
+	class iterator : public const_iterator
+	{
+	public:
+
+		using value_type = ElemType;
+
+		iterator()
+		{
+
+		}
+
+		iterator(vector *v, int idx)
+			: const_iterator(v, idx)
+		{
+
+		}
+
+		iterator(const iterator &other)
+			: const_iterator(other)
+		{
+		}
+
+		ElemType* operator ->()
 		{
 			return &(*vectPtr)[idx];
 		}
@@ -284,38 +348,6 @@ public:
 			return (*vectPtr)[idx];
 		}
 
-		const ElemType& operator*() const
-		{
-			return (*vectPtr)[idx];
-		}
-
-		bool operator == (const iterator& other) const
-		{
-			if (&other == this)
-			{
-				return true;
-			}
-			return vectPtr == other.vectPtr && idx == other.idx;
-		}
-
-		bool operator != (const iterator &other) const
-		{
-			return !(*this == other);
-		}
-
-		bool operator < (const iterator& other) const
-		{
-			return this->idx < other.idx;
-		}
-
-		bool operator <= (const iterator& other) const
-		{
-			return *this < other || *this == other;
-		}
-
-	protected:
-		vector *vectPtr;
-		int idx;
 	};
 
 	class reverse_iterator : public iterator
@@ -352,6 +384,16 @@ public:
 	iterator end()
 	{
 		return iterator(this, _size);
+	}
+
+	const_iterator cbegin() const
+	{
+		return const_iterator(this, 0);
+	}
+
+	const_iterator cend() const
+	{
+		return const_iterator(this, _size);
 	}
 
 	reverse_iterator rbegin()

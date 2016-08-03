@@ -6,6 +6,8 @@
 #define _QUEUE_HPP_
 
 #include <macros.hpp>
+#include <vector.hpp>
+#include <algorithm.hpp>
 
 #include <algorithm>
 #include <functional>
@@ -179,16 +181,53 @@ private:
 	size_t _capacity{0};
 };
 
-template <typename ElemType>
+template <typename ElemType, typename ContainerType = gtl::vector<ElemType>, typename ComparatorType = gtl::less<ContainerType::value_type>>
 class priority_queue
 {
 public:
-	using value_type = ElemType;
-	using comparator_type = std::function<bool (const ElemType&, const ElemType&)>;
+	using value_type = typename ContainerType::value_type;
 
 	priority_queue() {
 
 	}
+
+	priority_queue(const ComparatorType &comp) : comp(comp) {
+
+	}
+
+	template <typename InIterator>
+	priority_queue(InIterator inBegin, InIterator inEnd) 
+		: c(inBegin, inEnd)
+	{
+		make_heap(c.begin(), c.end());
+	}
+
+	const value_type & top() const {
+		return *(c.cbegin());
+	}
+
+	void pop() {
+		pop_heap(c.begin(), c.end());
+		c.pop_back();
+	}
+
+	void push(const ElemType &elem) {
+		c.push_back(elem);
+		push_heap(c.begin(), c.end());
+	}
+
+	void push(ElemType &&elem) {
+		c.push_back(elem);
+		push_heap(c.begin(), c.end());
+	}
+
+	bool empty() {
+		return c.empty();
+	}
+
+private:
+	ContainerType c;
+	ComparatorType comp;
 };
 
 NS_END(gtl)
