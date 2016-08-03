@@ -1,5 +1,8 @@
 #include "binheap.hpp"
 
+#include "vector.hpp"
+#include "algorithm.hpp"
+
 #include <iostream>
 
 #include <cstdlib>
@@ -24,6 +27,30 @@ int main(void)
 	{
 		h.pop(min);
 		std::cout << min << std::endl;
+	}
+
+	std::cout << "test heap algorithms" << std::endl;
+	gtl::vector<int> v{3, 6, 4, 7, 12, 1};
+	for (auto elem : v)
+	{
+		std::cout << elem << std::endl;
+	}
+	std::cout << std::endl;
+	make_heap(v.begin(), v.end());
+	std::cout << "after make_heap" << std::endl;
+	for (auto elem : v)
+	{
+		std::cout << elem << std::endl;
+	}
+	std::cout << std::endl;
+	v.push_back(19);
+	push_heap(v.begin(), v.end());
+	v.push_back(2);
+	push_heap(v.begin(), v.end());
+	sort_heap(v.begin(), v.end());
+	for (auto elem : v)
+	{
+		std::cout << elem << std::endl;
 	}
 
 	system("pause");

@@ -16,23 +16,28 @@ NS_BEGIN(gtl);
 
 #define _MOVE_FUNC_FOR_PRIMARY_TYPE(type)								\
 template <>																\
-inline void move<type *>(type *inBegin, type *inEnd, type *outBegin)	\
-{																		\
-	::_memccpy(outBegin, inBegin, sizeof(type), inEnd - inBegin);		\
+inline type * move<const type *, type *>(const type *inBegin, const type *inEnd, type *outBegin)	\
+{																					\
+	printf("primary type move");													\
+	size_t count = inEnd -inBegin;													\
+	::_memccpy((void*)outBegin, (void*)inBegin, sizeof(type), count);				\
+	return outBegin + count;														\
 }
 
-template <typename Iterator>
-inline void move(Iterator srcBegin, Iterator srcEnd, Iterator destBegin)
+template <typename InIterator, typename OutIterator>
+inline OutIterator move(InIterator srcBegin, InIterator srcEnd, OutIterator destBegin)
 {
 	while (srcBegin < srcEnd)
-		*destBegin++ = *srcBegin++;
+		*destBegin++ = gtl::move(*srcBegin++);
+	return destBegin;
 }
 
-template <typename Iterator>
-inline void move(Iterator srcBegin, Iterator srcEnd, Iterator destBegin, Iterator destEnd)
+template <typename InIterator, typename OutIterator>
+inline OutIterator move(InIterator srcBegin, InIterator srcEnd, OutIterator destBegin, OutIterator destEnd)
 {
 	while (srcBegin < srcEnd && destBegin < destEnd)
-		*destBegin++ = *srcBegin++;
+		*destBegin++ = gtl::move(*srcBegin++);
+	return destBegin;
 }
 
 _MOVE_FUNC_FOR_PRIMARY_TYPE(char);
@@ -123,6 +128,81 @@ struct less
 		return left < right;
 	}
 };
+
+template <typename Iterator>
+void __percolateDown(Iterator begin, int len, int hole)
+{
+	typename Iterator::value_type tmp = gtl::move(*(begin + hole));
+	for (int child; hole * 2 + 1 <= len - 1; hole = child)
+	{
+		child = hole * 2 + 1;
+
+		if (child != len - 1 && *(begin + child) < *(begin + child + 1)) {
+			child = child + 1;
+		}
+
+		if (*(begin + hole) < *(begin + child)) {
+			*(begin + hole) = gtl::move(*(begin + child));
+		}
+		else {
+			break;
+		}
+	}
+	*(begin + hole) = gtl::move(tmp);
+}
+
+template <typename Iterator>
+void __percolateUp(Iterator begin, int len, int hole)
+{
+	typename Iterator::value_type tmp = gtl::move(*(begin + len - 1));
+	int parent = (hole - 1) / 2;
+	while (hole > 0 && *(begin + parent) < tmp)
+	{
+		hole = *(begin + parent * 2 + 1) < *(begin + parent * 2 + 2) ? parent * 2 + 2 : parent * 2 + 1;
+		if (*(begin + parent) < *(begin + hole))
+			*(begin + hole) = gtl::move(*(begin + parent));
+		else
+			break;
+		hole = parent;
+
+		parent = (hole - 1) / 2;
+	}
+
+	*(begin + hole) = gtl::move(tmp);
+}
+
+template <typename Iterator>
+void make_heap(Iterator begin, Iterator end)
+{
+	int len = end - begin;
+	for (int i = 0; i < len / 2; ++i)
+	{
+		__percolateDown(begin, len, i);
+	}
+}
+
+template <typename Iterator>
+void push_heap(Iterator begin, Iterator end)
+{
+	int len = end - begin;
+	__percolateUp(begin, len, len - 1);
+}
+
+template <typename Iterator>
+void pop_heap(Iterator begin, Iterator end)
+{
+	gtl::swap(*begin, *(end - 1));
+	__percolateDown(begin, end - begin, 0);
+}
+
+template <typename Iterator>
+void sort_heap(Iterator begin, Iterator end)
+{
+	while (end - begin > 1)
+	{
+		pop_heap(begin, end--);
+	}
+}
 
 NS_END(gtl);
 

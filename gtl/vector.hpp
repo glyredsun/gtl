@@ -27,10 +27,7 @@ public:
 	vector(std::initializer_list<ElemType> args)
 		: vector(args.size())
 	{
-		for (size_t i = 0; i < args.size(); ++i)
-		{
-			(*this)[i] = *(args.begin() + i);
-		}
+		gtl::move(args.begin(), args.end(), _datas, _datas + _size);
 	}
 
 	~vector()
