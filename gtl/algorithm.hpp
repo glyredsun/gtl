@@ -137,16 +137,13 @@ void __percolateDown(Iterator begin, int len, int hole)
 	{
 		child = hole * 2 + 1;
 
-		if (child != len - 1 && *(begin + child) < *(begin + child + 1)) {
-			child = child + 1;
-		}
+		if (child != len - 1 && *(begin + child) < *(begin + child + 1))
+			++child;
 
-		if (*(begin + hole) < *(begin + child)) {
+		if (tmp < *(begin + child))
 			*(begin + hole) = gtl::move(*(begin + child));
-		}
-		else {
+		else
 			break;
-		}
 	}
 	*(begin + hole) = gtl::move(tmp);
 }
@@ -154,17 +151,12 @@ void __percolateDown(Iterator begin, int len, int hole)
 template <typename Iterator>
 void __percolateUp(Iterator begin, int len, int hole)
 {
-	typename Iterator::value_type tmp = gtl::move(*(begin + len - 1));
+	typename Iterator::value_type tmp = gtl::move(*(begin + hole));
 	int parent = (hole - 1) / 2;
 	while (hole > 0 && *(begin + parent) < tmp)
 	{
-		hole = *(begin + parent * 2 + 1) < *(begin + parent * 2 + 2) ? parent * 2 + 2 : parent * 2 + 1;
-		if (*(begin + parent) < *(begin + hole))
-			*(begin + hole) = gtl::move(*(begin + parent));
-		else
-			break;
+		*(begin + hole) = gtl::move(*(begin + parent));
 		hole = parent;
-
 		parent = (hole - 1) / 2;
 	}
 
@@ -175,7 +167,7 @@ template <typename Iterator>
 void make_heap(Iterator begin, Iterator end)
 {
 	int len = end - begin;
-	for (int i = 0; i < len / 2; ++i)
+	for (int i = len / 2; i >= 0; --i)
 	{
 		__percolateDown(begin, len, i);
 	}
@@ -192,7 +184,7 @@ template <typename Iterator>
 void pop_heap(Iterator begin, Iterator end)
 {
 	gtl::swap(*begin, *(end - 1));
-	__percolateDown(begin, end - begin, 0);
+	__percolateDown(begin, end - begin - 1, 0);
 }
 
 template <typename Iterator>
