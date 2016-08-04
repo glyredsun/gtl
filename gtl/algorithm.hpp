@@ -148,7 +148,7 @@ void __percolateDown(Iterator begin, int len, int hole)
 }
 
 template <typename Iterator>
-void __percolateUp(Iterator begin, int len, int hole)
+void __percolateUp(Iterator begin, int hole)
 {
 	typename Iterator::value_type tmp = gtl::move(*(begin + hole));
 	int parent = (hole - 1) / 2;
@@ -176,7 +176,7 @@ template <typename Iterator>
 void push_heap(Iterator begin, Iterator end)
 {
 	int len = end - begin;
-	__percolateUp(begin, len, len - 1);
+	__percolateUp(begin, len - 1);
 }
 
 template <typename Iterator>
