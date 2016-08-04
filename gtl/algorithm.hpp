@@ -9,20 +9,9 @@
 #include <algorithm.hpp>
 #include <type_traits.hpp>
 
-#include <cstdlib>
-#include <algorithm>
+#include <cstring>
 
 NS_BEGIN(gtl);
-
-#define _MOVE_FUNC_FOR_PRIMARY_TYPE(type)								\
-template <>																\
-inline type * move<const type *, type *>(const type *inBegin, const type *inEnd, type *outBegin)	\
-{																					\
-	printf("primary type move");													\
-	size_t count = inEnd -inBegin;													\
-	::_memccpy((void*)outBegin, (void*)inBegin, sizeof(type), count);				\
-	return outBegin + count;														\
-}
 
 template <typename InIterator, typename OutIterator>
 inline OutIterator move(InIterator srcBegin, InIterator srcEnd, OutIterator destBegin)
@@ -40,11 +29,21 @@ inline OutIterator move(InIterator srcBegin, InIterator srcEnd, OutIterator dest
 	return destBegin;
 }
 
-_MOVE_FUNC_FOR_PRIMARY_TYPE(char);
-_MOVE_FUNC_FOR_PRIMARY_TYPE(int);
-_MOVE_FUNC_FOR_PRIMARY_TYPE(float);
-_MOVE_FUNC_FOR_PRIMARY_TYPE(double);
-_MOVE_FUNC_FOR_PRIMARY_TYPE(short);
+template <typename T>
+inline T* move(T *srcBegin, T *srcEnd, T *destBegin)
+{
+	size_t count = srcEnd - srcBegin;
+	memcpy(destBegin, srcBegin, sizeof(T) * count);
+	return destBegin + count;
+}
+
+template <typename T>
+inline T* move(T *srcBegin, T *srcEnd, T *destBegin, T *destEnd)
+{
+	size_t count = srcEnd - srcBegin < destEnd - destBegin ? srcEnd - srcBegin : destEnd - destBegin;
+	memcpy(destBegin, srcBegin, sizeof(T) * count);
+	return destBegin + count;
+}
 
 // binary search
 template <typename Iterator, typename DataType, typename Comparator>

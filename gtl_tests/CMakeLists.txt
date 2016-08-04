@@ -39,3 +39,6 @@ include_directories(hash_test ${gtl_dir})
 
 add_executable(type_traits_test type_traits_test.cpp)
 include_directories(type_traits_test ${gtl_dir})
+
+add_executable(algorithm_test algorithm_test.cpp)
+include_directories(algorithm_test ${gtl_dir})
