@@ -5,6 +5,8 @@
 #ifndef _ITERATOR_BASE_HPP_
 #define _ITERATOR_BASE_HPP_
 
+#include <macros.hpp>
+
 #include <cstddef>
 
 NS_BEGIN(gtl)

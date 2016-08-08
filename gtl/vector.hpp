@@ -24,9 +24,9 @@ public:
 	typedef ElemType value_type;
 	typedef value_type* iterator;
 	typedef const value_type* const_iterator;
-	typedef reverse_iterator<iterator> reverse_iterator;
 	typedef reverse_iterator<const_iterator> const_reverse_iterator;
-	typedef vector<value_type> SelfType;
+	typedef reverse_iterator<iterator> reverse_iterator;
+	typedef vector<value_type> _SelfType;
 
 	vector(size_t initSize = 0)
 	{

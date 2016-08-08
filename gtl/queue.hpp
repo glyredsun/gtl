@@ -203,7 +203,7 @@ public:
 	}
 
 	const value_type & top() const {
-		return *(c.cbegin());
+		return *(c.begin());
 	}
 
 	void pop() {

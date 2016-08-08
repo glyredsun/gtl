@@ -8,6 +8,7 @@
 #include <macros.hpp>
 #include <algorithm.hpp>
 #include <type_traits.hpp>
+#include <iterator_base.hpp>
 
 #include <cstring>
 
@@ -69,7 +70,7 @@ inline Iterator search(Iterator begin, Iterator end, const DataType &target, Com
 template <typename Iterator, typename DataType>
 inline Iterator search(Iterator begin, Iterator end, const DataType &target)
 {
-	return search(begin, end, target, gtl::less<Iterator::value_type>());
+	return search(begin, end, target, gtl::less<typename iterator_traits<Iterator>::value_type>());
 }
 
 // get the power of two number big than num
@@ -114,7 +115,7 @@ inline const T& min(const T& a, const T& b)
 }
 
 template <typename Iterator>
-inline int distance(const Iterator first, const Iterator last)
+typename iterator_traits<Iterator>::defference_type distance(const Iterator first, const Iterator last)
 {
 	return last - first;
 }
@@ -131,7 +132,7 @@ struct less
 template <typename Iterator>
 void __percolateDown(Iterator begin, int len, int hole)
 {
-	typename Iterator::value_type tmp = gtl::move(*(begin + hole));
+	typename iterator_traits<Iterator>::value_type tmp = gtl::move(*(begin + hole));
 	for (int child; hole * 2 + 1 <= len - 1; hole = child)
 	{
 		child = hole * 2 + 1;
@@ -150,7 +151,7 @@ void __percolateDown(Iterator begin, int len, int hole)
 template <typename Iterator>
 void __percolateUp(Iterator begin, int hole)
 {
-	typename Iterator::value_type tmp = gtl::move(*(begin + hole));
+	typename iterator_traits<Iterator>::value_type tmp = gtl::move(*(begin + hole));
 	int parent = (hole - 1) / 2;
 	while (hole > 0 && *(begin + parent) < tmp)
 	{

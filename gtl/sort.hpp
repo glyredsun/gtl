@@ -56,7 +56,7 @@ void shellSort(const Iterator &begin, const Iterator &end, Comparator lessThan)
 template <typename Iterator>
 void shellSort(const Iterator &begin, const Iterator &end)
 {
-	shellSort(begin, end, [](const decltype(*begin) first, const decltype(*begin) second) { return first < second; });
+	shellSort(begin, end, gtl::less<iterator_traits<Iterator>::value_type>());
 }
 
 template <typename Iterator, typename BufIterator, typename Comparator>
@@ -101,7 +101,7 @@ void mergeSort(Iterator begin, Iterator end, BufIterator bufBegin, const Compara
 template <typename Iterator, typename Comparator>
 void mergeSort(Iterator begin, Iterator end, const Comparator &lessThan)
 {
-	vector<Iterator::value_type> tmp(distance(begin, end));
+	vector<iterator_traits<Iterator>::value_type> tmp(distance(begin, end));
 	mergeSort(begin, end, tmp.begin(), lessThan);
 }
 
@@ -114,7 +114,7 @@ void mergeSort(Iterator begin, Iterator end)
 template <typename Iterator, typename Comparator>
 void mergeSortParallel(Iterator begin, Iterator end, const Comparator &lessThan)
 {
-	typedef vector<Iterator::value_type> BufType;
+	typedef vector<iterator_traits<Iterator>::value_type> BufType;
 	BufType tmp(distance(begin, end));
 	BufType::iterator bufBegin = tmp.begin();
 

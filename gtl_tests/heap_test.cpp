@@ -36,7 +36,7 @@ int main(void)
 		std::cout << elem << std::endl;
 	}
 	std::cout << std::endl;
-	make_heap(v.begin(), v.end());
+	gtl::make_heap(v.begin(), v.end());
 	std::cout << "after make_heap" << std::endl;
 	for (auto elem : v)
 	{
@@ -44,20 +44,20 @@ int main(void)
 	}
 	std::cout << std::endl;
 	v.push_back(19);
-	push_heap(v.begin(), v.end());
+	gtl::push_heap(v.begin(), v.end());
 	std::cout << "after push 19" << std::endl;
 	for (auto elem : v)
 	{
 		std::cout << elem << std::endl;
 	}
 	v.push_back(2);
-	push_heap(v.begin(), v.end());
+	gtl::push_heap(v.begin(), v.end());
 	std::cout << "after push 2" << std::endl;
 	for (auto elem : v)
 	{
 		std::cout << elem << std::endl;
 	}
-	sort_heap(v.begin(), v.end());
+	gtl::sort_heap(v.begin(), v.end());
 	std::cout << "after sort_heap" << std::endl;
 	for (auto elem : v)
 	{
