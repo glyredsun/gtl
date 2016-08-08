@@ -7,7 +7,7 @@
 
 #include <macros.hpp>
 #include <memory.hpp>
-
+#include <iterator_base.hpp>
 #include <algorithm.hpp>
 
 NS_BEGIN(gtl)
@@ -16,7 +16,13 @@ template<typename ElemType>
 class vector
 {
 public:
-	using value_type = ElemType;
+	
+	typedef ElemType value_type;
+	typedef value_type* iterator;
+	typedef const value_type* const_iterator;
+	typedef reverse_iterator<iterator> reverse_iterator;
+	typedef reverse_iterator<const_iterator> const_reverse_iterator;
+	typedef vector<value_type> SelfType;
 
 	vector(size_t initSize = 0)
 	{
@@ -203,207 +209,35 @@ protected:
 	}
 
 public:
-	class const_iterator
-	{
-	public:
-
-		using value_type = ElemType;
-
-		const_iterator()
-			: vectPtr(nullptr), idx(0)
-		{
-
-		}
-
-		const_iterator(vector *v, int idx)
-			: vectPtr(v), idx(idx)
-		{
-
-		}
-
-		const_iterator(const const_iterator &other)
-			: vectPtr(other.vectPtr), idx(other.idx)
-		{
-		}
-
-		const_iterator& operator ++()
-		{
-			++idx;
-			return *this;
-		}
-
-		const_iterator operator ++(int)
-		{
-			iterator copy = *this;
-			++*this;
-			return copy;
-		}
-
-		const_iterator& operator --()
-		{
-			--idx;
-			return *this;
-		}
-
-		const_iterator operator --(int)
-		{
-			iterator copy = *this;
-			--*this;
-			return copy;
-		}
-
-		const_iterator operator +(int offset) const
-		{
-			return iterator(vectPtr, idx + offset);
-		}
-
-		const_iterator operator -(int offset) const
-		{
-			return *this + (-offset);
-		}
-
-		int operator -(const const_iterator &right) const
-		{
-			return idx - right.idx;
-		}
-
-		const_iterator& operator =(const const_iterator& other)
-		{
-			if (&other != this)
-			{
-				this->vectPtr = other.vectPtr;
-				this->idx = other.idx;
-			}
-			return *this;
-		}
-
-		const ElemType* operator ->() const
-		{
-			return &(*vectPtr)[idx];
-		}
-
-		const ElemType& operator*() const
-		{
-			return (*vectPtr)[idx];
-		}
-
-		bool operator == (const const_iterator& other) const
-		{
-			if (&other == this)
-			{
-				return true;
-			}
-			return vectPtr == other.vectPtr && idx == other.idx;
-		}
-
-		bool operator != (const const_iterator &other) const
-		{
-			return !(*this == other);
-		}
-
-		bool operator < (const const_iterator& other) const
-		{
-			return this->idx < other.idx;
-		}
-
-		bool operator <= (const const_iterator& other) const
-		{
-			return *this < other || *this == other;
-		}
-
-	protected:
-		vector *vectPtr;
-		int idx;
-	};
-
-	class iterator : public const_iterator
-	{
-	public:
-
-		using value_type = ElemType;
-
-		iterator()
-		{
-
-		}
-
-		iterator(vector *v, int idx)
-			: const_iterator(v, idx)
-		{
-
-		}
-
-		iterator(const iterator &other)
-			: const_iterator(other)
-		{
-		}
-
-		ElemType* operator ->()
-		{
-			return &(*vectPtr)[idx];
-		}
-
-		ElemType& operator*()
-		{
-			return (*vectPtr)[idx];
-		}
-
-	};
-
-	class reverse_iterator : public iterator
-	{
-	public:
-		reverse_iterator(vector *vectPtr, int idx)
-			: iterator(vectPtr, idx)
-		{
-
-		}
-
-		reverse_iterator operator ++(int)
-		{
-			reverse_iterator copy = *this;
-			--idx;
-			return copy;
-		}
-
-		reverse_iterator& operator ++()
-		{
-			--idx;
-			return *this;
-		}
-
-	};
-
-public:
 
 	iterator begin()
 	{
-		return iterator(this, 0);
+		return iterator(_datas);
 	}
 
 	iterator end()
 	{
-		return iterator(this, _size);
+		return iterator(_datas + _size);
 	}
 
-	const_iterator cbegin() const
+	const_iterator begin() const
 	{
-		return const_iterator(this, 0);
+		return const_iterator(_datas);
 	}
 
-	const_iterator cend() const
+	const_iterator end() const
 	{
-		return const_iterator(this, _size);
+		return const_iterator(_datas + _size);
 	}
 
 	reverse_iterator rbegin()
 	{
-		return reverse_iterator(this, _size - 1);
+		return reverse_iterator(end());
 	}
 
 	reverse_iterator rend()
 	{
-		return reverse_iterator(this, -1);
+		return reverse_iterator(begin());
 	}
 
 	void erase(const iterator &where)

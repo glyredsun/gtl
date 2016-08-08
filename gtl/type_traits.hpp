@@ -8,6 +8,11 @@
 
 NS_BEGIN(gtl)
 
+struct __true_type {};
+struct __false_type {};
+
+
+
 template <typename Type>
 struct remove_reference
 {
