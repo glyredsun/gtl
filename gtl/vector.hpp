@@ -12,15 +12,16 @@
 #include <algorithm.hpp>
 #include <alloc.hpp>
 
-#include <algorithm>
+#include <initializer_list>
 
 NS_BEGIN(gtl)
 
-template<class ElemType>
+template<class ElemType, class Allocator = allocator<ElemType>>
 class vector
 {
 public:
 	
+	typedef Allocator allocator_type;
 	typedef ElemType value_type;
 	typedef value_type* iterator;
 	typedef const value_type* const_iterator;
@@ -291,6 +292,7 @@ public:
 	}
 
 private:
+	allocator_type _alloc;
 	static const size_t SPARE_SIZE = 16;
 	size_t _capacity{0};
 	size_t _size{0};

@@ -105,19 +105,45 @@ public:
 		return *(*this + n);
 	}
 
-	bool operator==(const _SelfType& other)
-	{
-		return _current == other._current;
-	}
-
-	bool operator!=(const _SelfType& other)
-	{
-		return !operator==(other);
-	}
-
 private:
 	iterator_type _current;
 };
+
+template <class Iterator>
+bool operator==(const reverse_iterator<Iterator>& left, const reverse_iterator<Iterator>& right)
+{
+	return left.base() == right.base();
+}
+
+template <class Iterator>
+bool operator!=(const reverse_iterator<Iterator>& left, const reverse_iterator<Iterator>& right)
+{
+	return !(left == right);
+}
+
+template <class Iterator>
+bool operator<(const reverse_iterator<Iterator>& left, const reverse_iterator<Iterator>& right)
+{
+	return left.base() > right.base();
+}
+
+template <class Iterator>
+bool operator>(const reverse_iterator<Iterator>& left, const reverse_iterator<Iterator>& right)
+{
+	return left.base() < right.base();
+}
+
+template <class Iterator>
+bool operator<=(const reverse_iterator<Iterator>& left, const reverse_iterator<Iterator>& right)
+{
+	return !(left > right);
+}
+
+template <class Iterator>
+bool operator>=(const reverse_iterator<Iterator>& left, const reverse_iterator<Iterator>& right)
+{
+	return !(left < right);
+}
 
 NS_END(gtl)
 
