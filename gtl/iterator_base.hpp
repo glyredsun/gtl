@@ -5,6 +5,8 @@
 #ifndef _ITERATOR_BASE_HPP_
 #define _ITERATOR_BASE_HPP_
 
+#include <cstddef>
+
 NS_BEGIN(gtl)
 
 struct input_iterator_tag {};
@@ -15,11 +17,11 @@ struct random_access_iterator_tag : public bidirectional_iterator_tag {};
 
 template <class Iterator>
 struct iterator_traits {
-	typedef Iterator::value_type value_type;
-	typedef Iterator::difference_type defference_type;
-	typedef Iterator::pointer pointer;
-	typedef Iterator::reference reference;
-	typedef Iterator::iterator_category iterator_category;
+	typedef typename Iterator::value_type value_type;
+	typedef typename Iterator::difference_type defference_type;
+	typedef typename Iterator::pointer pointer;
+	typedef typename Iterator::reference reference;
+	typedef typename Iterator::iterator_category iterator_category;
 };
 
 template <class Type>

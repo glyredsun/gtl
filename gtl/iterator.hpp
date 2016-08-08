@@ -17,14 +17,24 @@ public:
 	typedef Iterator iterator_type;
 	typedef reverse_iterator<iterator_type> _SelfType;
 
-	typedef iterator_traits<iterator_type>::value_type value_type;
-	typedef iterator_traits<iterator_type>::defference_type defference_type;
-	typedef iterator_traits<iterator_type>::pointer pointer;
-	typedef iterator_traits<iterator_type>::reference reference;
-	typedef iterator_traits<iterator_type>::iterator_category iterator_category;
+	typedef typename iterator_traits<iterator_type>::value_type value_type;
+	typedef typename iterator_traits<iterator_type>::defference_type defference_type;
+	typedef typename iterator_traits<iterator_type>::pointer pointer;
+	typedef typename iterator_traits<iterator_type>::reference reference;
+	typedef typename iterator_traits<iterator_type>::iterator_category iterator_category;
 
+	reverse_iterator() {}
 	explicit reverse_iterator(const iterator_type &itr) : _current(itr) { }
-	explicit reverse_iterator(const _SelfType &other) : _current(other._current) {}
+	reverse_iterator(const _SelfType &other) : _current(other._current) {}
+
+	_SelfType operator= (const _SelfType& other)
+	{
+		if (&other != this)
+		{
+			_current = other->_current;
+		}
+		return *this;
+	}
 
 	iterator_type base() const
 	{
@@ -93,6 +103,16 @@ public:
 	reference operator[](defference_type n) const
 	{
 		return *(*this + n);
+	}
+
+	bool operator==(const _SelfType& other)
+	{
+		return _current == other._current;
+	}
+
+	bool operator!=(const _SelfType& other)
+	{
+		return !operator==(other);
 	}
 
 private:
