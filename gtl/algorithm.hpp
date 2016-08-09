@@ -2,8 +2,8 @@
 #pragma once
 #endif
 
-#ifndef ALGORITHMS_HPP_
-#define ALGORITHMS_HPP_
+#ifndef _ALGORITHMS_HPP_
+#define _ALGORITHMS_HPP_
 
 #include <macros.hpp>
 #include <algorithm.hpp>
@@ -15,7 +15,15 @@
 NS_BEGIN(gtl);
 
 template <typename InIterator, typename OutIterator>
-inline OutIterator move(InIterator srcBegin, InIterator srcEnd, OutIterator destBegin)
+inline OutIterator _move(InIterator srcBegin, InIterator srcEnd, OutIterator destBegin, __true_type)
+{
+	auto count = gtl::distance(srcBegin, srcEnd);
+	::memmove(&(*destBegin), &(*srcBegin), count * sizeof(iterator_traits<InIterator>::value_type));
+	return destBegin + count;
+}
+
+template <typename InIterator, typename OutIterator>
+inline OutIterator _move(InIterator srcBegin, InIterator srcEnd, OutIterator destBegin, __false_type)
 {
 	while (srcBegin < srcEnd)
 		*destBegin++ = gtl::move(*srcBegin++);
@@ -23,28 +31,50 @@ inline OutIterator move(InIterator srcBegin, InIterator srcEnd, OutIterator dest
 }
 
 template <typename InIterator, typename OutIterator>
+inline OutIterator move(InIterator srcBegin, InIterator srcEnd, OutIterator destBegin)
+{
+	return _move(srcBegin, srcEnd, destBegin, type_traits<iterator_traits<OutIterator>::value_type>::has_trivial_assignment_operator());
+}
+
+template <typename InIterator, typename OutIterator>
 inline OutIterator move(InIterator srcBegin, InIterator srcEnd, OutIterator destBegin, OutIterator destEnd)
 {
-	while (srcBegin < srcEnd && destBegin < destEnd)
-		*destBegin++ = gtl::move(*srcBegin++);
+	auto count1 = gtl::distance(srcBegin, srcEnd);
+	auto count2 = gtl::distance(destBegin, destEnd);
+	return move(srcBegin, srcBegin + (count1 <= count2 ? count1 : count2), destBegin);
+}
+
+template <typename InIterator, typename OutIterator>
+inline OutIterator copy(InIterator srcBegin, InIterator srcEnd, OutIterator destBegin)
+{
+	while (srcBegin < srcEnd)
+		*destBegin++ = *srcBegin++;
 	return destBegin;
 }
 
-template <typename T>
-inline T* move(T *srcBegin, T *srcEnd, T *destBegin)
+template <typename InIterator, typename OutIterator>
+inline OutIterator copy(InIterator srcBegin, InIterator srcEnd, OutIterator destBegin, OutIterator destEnd)
 {
-	size_t count = srcEnd - srcBegin;
-	memcpy(destBegin, srcBegin, sizeof(T) * count);
-	return destBegin + count;
+	while (srcBegin < srcEnd && destBegin < destEnd)
+		*destBegin++ = *srcBegin++;
+	return destBegin;
 }
 
-template <typename T>
-inline T* move(T *srcBegin, T *srcEnd, T *destBegin, T *destEnd)
-{
-	size_t count = srcEnd - srcBegin < destEnd - destBegin ? srcEnd - srcBegin : destEnd - destBegin;
-	memcpy(destBegin, srcBegin, sizeof(T) * count);
-	return destBegin + count;
-}
+//template <typename T>
+//inline T* move(T *srcBegin, T *srcEnd, T *destBegin)
+//{
+//	size_t count = srcEnd - srcBegin;
+//	memcpy(destBegin, srcBegin, sizeof(T) * count);
+//	return destBegin + count;
+//}
+//
+//template <typename T>
+//inline T* move(T *srcBegin, T *srcEnd, T *destBegin, T *destEnd)
+//{
+//	size_t count = srcEnd - srcBegin < destEnd - destBegin ? srcEnd - srcBegin : destEnd - destBegin;
+//	memcpy(destBegin, srcBegin, sizeof(T) * count);
+//	return destBegin + count;
+//}
 
 // binary search
 template <typename Iterator, typename DataType, typename Comparator>
@@ -198,4 +228,4 @@ void sort_heap(Iterator begin, Iterator end)
 
 NS_END(gtl);
 
-#endif
+#endif // !_ALGORITHMS_HPP_
