@@ -13,25 +13,25 @@ struct __false_type {};
 
 
 
-template <typename Type>
+template <class Type>
 struct remove_reference
 {
 	using type = Type;
 };
 
-template <typename Type>
+template <class Type>
 struct remove_reference<Type&>
 {
 	using type = Type;
 };
 
-template <typename Type>
+template <class Type>
 struct remove_reference<Type&&>
 {
 	using type = Type;
 };
 
-template <typename Type>
+template <class Type>
 constexpr inline typename remove_reference<Type>::type&& move(Type&& value)
 {
 	return static_cast<typename remove_reference<Type>::type&&>(value);

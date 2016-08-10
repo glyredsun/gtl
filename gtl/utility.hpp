@@ -8,7 +8,7 @@
 
 NS_BEGIN(gtl)
 
-template <typename T, typename U>
+template <class T, class U>
 struct pair
 {
 	pair() : first(), second() {}

@@ -12,7 +12,7 @@
 
 NS_BEGIN(gtl);
 
-template <typename ElemType>
+template <class ElemType>
 class list
 {
 public:
@@ -34,7 +34,7 @@ public:
 
 	list(list &&other)
 	{
-		moveFrom(other);
+		moveFrom(gtl::move(other));
 	}
 
 	list& operator =(const list &other)
@@ -48,7 +48,7 @@ public:
 	list& operator =(list &&other)
 	{
 		if (this != &other) {
-			moveFrom(other);
+			moveFrom(gtl::move(other));
 		}
 		return *this;
 	}
@@ -171,7 +171,7 @@ protected:
 		}
 	}
 
-	void moveFrom(list &other)
+	void moveFrom(list &&other)
 	{
 		clear();
 

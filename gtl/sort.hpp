@@ -8,7 +8,7 @@
 
 NS_BEGIN(gtl)
 
-template <typename Iterator, typename Comparator>
+template <class Iterator, class Comparator>
 void insertionSort(const Iterator &begin, const Iterator &end, Comparator lessThan)
 {
 	if (begin == end) {
@@ -28,13 +28,13 @@ void insertionSort(const Iterator &begin, const Iterator &end, Comparator lessTh
 	}
 }
 
-template <typename Iterator>
+template <class Iterator>
 void insertionSort(const Iterator &begin, const Iterator &end)
 {
 	insertionSort(begin, end, [](const decltype(*begin) &first, const decltype(*begin) second) { return first < second; });
 }
 
-template <typename Iterator, typename Comparator>
+template <class Iterator, class Comparator>
 void shellSort(const Iterator &begin, const Iterator &end, Comparator lessThan)
 {
 	for (int gap = (end - begin) / 2; gap > 0; gap /= 2)
@@ -53,13 +53,13 @@ void shellSort(const Iterator &begin, const Iterator &end, Comparator lessThan)
 	}
 }
 
-template <typename Iterator>
+template <class Iterator>
 void shellSort(const Iterator &begin, const Iterator &end)
 {
 	shellSort(begin, end, gtl::less<iterator_traits<Iterator>::value_type>());
 }
 
-template <typename Iterator, typename BufIterator, typename Comparator>
+template <class Iterator, class BufIterator, class Comparator>
 void merge(Iterator begin, Iterator end, BufIterator bufBegin, const Comparator &lessThan)
 {
 	int count = gtl::distance(begin, end);
@@ -85,7 +85,7 @@ void merge(Iterator begin, Iterator end, BufIterator bufBegin, const Comparator 
 		*begin++ = gtl::move(*bufBegin++);
 }
 
-template <typename Iterator, typename BufIterator, typename Comparator>
+template <class Iterator, class BufIterator, class Comparator>
 void mergeSort(Iterator begin, Iterator end, BufIterator bufBegin, const Comparator &lessThan)
 {
 	int count = gtl::distance(begin, end);
@@ -98,20 +98,20 @@ void mergeSort(Iterator begin, Iterator end, BufIterator bufBegin, const Compara
 	}
 }
 
-template <typename Iterator, typename Comparator>
+template <class Iterator, class Comparator>
 void mergeSort(Iterator begin, Iterator end, const Comparator &lessThan)
 {
 	vector<iterator_traits<Iterator>::value_type> tmp(distance(begin, end));
 	mergeSort(begin, end, tmp.begin(), lessThan);
 }
 
-template <typename Iterator>
+template <class Iterator>
 void mergeSort(Iterator begin, Iterator end)
 {
 	mergeSort(begin, end, [](const decltype(*begin) &left, const decltype(*begin) &right) { return left < right; });
 }
 
-template <typename Iterator, typename Comparator>
+template <class Iterator, class Comparator>
 void mergeSortParallel(Iterator begin, Iterator end, const Comparator &lessThan)
 {
 	typedef vector<iterator_traits<Iterator>::value_type> BufType;
@@ -182,7 +182,7 @@ void mergeSortParallel(Iterator begin, Iterator end, const Comparator &lessThan)
 	}
 }
 
-template <typename Iterator>
+template <class Iterator>
 void mergeSortParallel(Iterator begin, Iterator end)
 {
 	mergeSortParallel(begin, end, [](const decltype(*begin) &left, const decltype(*begin) &right) { return left < right; });

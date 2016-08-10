@@ -14,7 +14,7 @@
 
 NS_BEGIN(gtl);
 
-template <typename InIterator, typename OutIterator>
+template <class InIterator, class OutIterator>
 inline OutIterator _move(InIterator srcBegin, InIterator srcEnd, OutIterator destBegin, __true_type)
 {
 	auto count = gtl::distance(srcBegin, srcEnd);
@@ -22,7 +22,7 @@ inline OutIterator _move(InIterator srcBegin, InIterator srcEnd, OutIterator des
 	return destBegin + count;
 }
 
-template <typename InIterator, typename OutIterator>
+template <class InIterator, class OutIterator>
 inline OutIterator _move(InIterator srcBegin, InIterator srcEnd, OutIterator destBegin, __false_type)
 {
 	while (srcBegin < srcEnd)
@@ -30,13 +30,13 @@ inline OutIterator _move(InIterator srcBegin, InIterator srcEnd, OutIterator des
 	return destBegin;
 }
 
-template <typename InIterator, typename OutIterator>
+template <class InIterator, class OutIterator>
 inline OutIterator move(InIterator srcBegin, InIterator srcEnd, OutIterator destBegin)
 {
 	return _move(srcBegin, srcEnd, destBegin, type_traits<iterator_traits<OutIterator>::value_type>::has_trivial_assignment_operator());
 }
 
-template <typename InIterator, typename OutIterator>
+template <class InIterator, class OutIterator>
 inline OutIterator move(InIterator srcBegin, InIterator srcEnd, OutIterator destBegin, OutIterator destEnd)
 {
 	auto count1 = gtl::distance(srcBegin, srcEnd);
@@ -44,40 +44,36 @@ inline OutIterator move(InIterator srcBegin, InIterator srcEnd, OutIterator dest
 	return move(srcBegin, srcBegin + (count1 <= count2 ? count1 : count2), destBegin);
 }
 
-template <typename InIterator, typename OutIterator>
-inline OutIterator copy(InIterator srcBegin, InIterator srcEnd, OutIterator destBegin)
+template <class InIterator, class OutIterator>
+inline OutIterator _copy(InIterator srcBegin, InIterator srcEnd, OutIterator destBegin, __true_type)
+{
+	return _move(srcBegin, srcEnd, destBegin, __true_type());
+}
+
+template <class InIterator, class OutIterator>
+inline OutIterator _copy(InIterator srcBegin, InIterator srcEnd, OutIterator destBegin, __false_type)
 {
 	while (srcBegin < srcEnd)
 		*destBegin++ = *srcBegin++;
 	return destBegin;
 }
 
-template <typename InIterator, typename OutIterator>
-inline OutIterator copy(InIterator srcBegin, InIterator srcEnd, OutIterator destBegin, OutIterator destEnd)
+template <class InIterator, class OutIterator>
+inline OutIterator copy(InIterator srcBegin, InIterator srcEnd, OutIterator destBegin)
 {
-	while (srcBegin < srcEnd && destBegin < destEnd)
-		*destBegin++ = *srcBegin++;
-	return destBegin;
+	return _copy(srcBegin, srcEnd, destBegin, type_traits<iterator_traits<OutIterator>::value_type>::has_trivial_assignment_operator());
 }
 
-//template <typename T>
-//inline T* move(T *srcBegin, T *srcEnd, T *destBegin)
-//{
-//	size_t count = srcEnd - srcBegin;
-//	memcpy(destBegin, srcBegin, sizeof(T) * count);
-//	return destBegin + count;
-//}
-//
-//template <typename T>
-//inline T* move(T *srcBegin, T *srcEnd, T *destBegin, T *destEnd)
-//{
-//	size_t count = srcEnd - srcBegin < destEnd - destBegin ? srcEnd - srcBegin : destEnd - destBegin;
-//	memcpy(destBegin, srcBegin, sizeof(T) * count);
-//	return destBegin + count;
-//}
+template <class InIterator, class OutIterator>
+inline OutIterator copy(InIterator srcBegin, InIterator srcEnd, OutIterator destBegin, OutIterator destEnd)
+{
+	auto count1 = gtl::distance(srcBegin, srcEnd);
+	auto count2 = gtl::distance(destBegin, destEnd);
+	return copy(srcBegin, srcBegin + (count1 <= count2 ? count1 : count2), destBegin);
+}
 
 // binary search
-template <typename Iterator, typename DataType, typename Comparator>
+template <class Iterator, class DataType, class Comparator>
 inline Iterator search(Iterator begin, Iterator end, const DataType &target, Comparator &lessThan)
 {
 	Iterator endCopy = end;
@@ -97,14 +93,14 @@ inline Iterator search(Iterator begin, Iterator end, const DataType &target, Com
 	return endCopy;
 }
 
-template <typename Iterator, typename DataType>
+template <class Iterator, class DataType>
 inline Iterator search(Iterator begin, Iterator end, const DataType &target)
 {
 	return search(begin, end, target, gtl::less<typename iterator_traits<Iterator>::value_type>());
 }
 
 // get the power of two number big than num
-template <typename T>
+template <class T>
 inline T nextPOT(T num)
 {
 	for (size_t i = 1; i <= sizeof(T) * 8 / 2; i *= 2)
@@ -115,13 +111,13 @@ inline T nextPOT(T num)
 }
 
 // get the power of two number not big than num
-template <typename T>
+template <class T>
 inline T lastPOT(T num)
 {
 	return nextPOT(num) >> 1;
 }
 
-template <typename T>
+template <class T>
 inline void swap(T& left, T& right)
 {
 	if (&left != &right)
@@ -132,25 +128,25 @@ inline void swap(T& left, T& right)
 	}
 }
 
-template <typename T>
+template <class T>
 inline const T& max(const T& a, const T& b)
 {
 	return a > b ? a : b;
 }
 
-template <typename T>
+template <class T>
 inline const T& min(const T& a, const T& b)
 {
 	return a < b ? a : b;
 }
 
-template <typename Iterator>
+template <class Iterator>
 typename iterator_traits<Iterator>::defference_type distance(const Iterator first, const Iterator last)
 {
 	return last - first;
 }
 
-template <typename ArgType = void>
+template <class ArgType = void>
 struct less
 {
 	constexpr bool operator() (const ArgType &left, const ArgType &right) const 
@@ -159,7 +155,7 @@ struct less
 	}
 };
 
-template <typename Iterator>
+template <class Iterator>
 void __percolateDown(Iterator begin, int len, int hole)
 {
 	typename iterator_traits<Iterator>::value_type tmp = gtl::move(*(begin + hole));
@@ -178,7 +174,7 @@ void __percolateDown(Iterator begin, int len, int hole)
 	*(begin + hole) = gtl::move(tmp);
 }
 
-template <typename Iterator>
+template <class Iterator>
 void __percolateUp(Iterator begin, int hole)
 {
 	typename iterator_traits<Iterator>::value_type tmp = gtl::move(*(begin + hole));
@@ -193,7 +189,7 @@ void __percolateUp(Iterator begin, int hole)
 	*(begin + hole) = gtl::move(tmp);
 }
 
-template <typename Iterator>
+template <class Iterator>
 void make_heap(Iterator begin, Iterator end)
 {
 	int len = end - begin;
@@ -203,21 +199,21 @@ void make_heap(Iterator begin, Iterator end)
 	}
 }
 
-template <typename Iterator>
+template <class Iterator>
 void push_heap(Iterator begin, Iterator end)
 {
 	int len = end - begin;
 	__percolateUp(begin, len - 1);
 }
 
-template <typename Iterator>
+template <class Iterator>
 void pop_heap(Iterator begin, Iterator end)
 {
 	gtl::swap(*begin, *(end - 1));
 	__percolateDown(begin, end - begin - 1, 0);
 }
 
-template <typename Iterator>
+template <class Iterator>
 void sort_heap(Iterator begin, Iterator end)
 {
 	while (end - begin > 1)

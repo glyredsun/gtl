@@ -44,7 +44,7 @@ public:
 	vector(std::initializer_list<value_type> args)
 		: vector(args.size())
 	{
-		gtl::move(args.begin(), args.end(), _datas, _datas + _size);
+		gtl::move(args.begin(), args.end(), _start);
 	}
 
 	template <typename Iterator>
@@ -66,7 +66,7 @@ public:
 
 	vector(vector&& other)
 	{
-		moveFrom(other);
+		moveFrom(gtl::move(other));
 	}
 
 	vector& operator=(const vector& other)
@@ -93,33 +93,33 @@ public:
 		return _start[idx];
 	}
 
-	bool empty() {
+	bool empty() const {
 		return _start == _finish;
 	}
 
-	size_type size() {
+	size_type size() const {
 		return _finish - _start;
 	}
 
-	size_type capacity() {
+	size_type capacity() const {
 		return _end_of_storage - _start;
 	}
 
 	void resize(size_type newSize) {
-		if (newSize > _capacity) {
+		if (newSize > capacity()) {
 			reserve(newSize * 2);
 		}
 		_finish = _start + newSize;
 	}
 
 	void reserve(size_type newCapacity) {
-		if (newCapacity <= _finish - _start) {
+		if (newCapacity <= size()) {
 			return;
 		}
 
 		value_type *newStart = new value_type[newCapacity];
 
-		std::move(_start, _finish, newStart);
+		gtl::move(_start, _finish, newStart);
 
 		if (_start)
 			delete[] _start;
@@ -128,13 +128,13 @@ public:
 	}
 
 	void push_back(rvalue_reference data) {
-		resize(_size + 1);
-		_finish++ = std::move(data);
+		resize(size() + 1);
+		*_finish = std::move(data);
 	}
 
 	void push_back(const_reference data) {
-		resize(_size + 1);
-		_finish++ = data;
+		resize(size() + 1);
+		*_finish = data;
 	}
 
 	void pop_back() {
@@ -143,6 +143,84 @@ public:
 
 	void clear() {
 		_finish = _start;
+	}
+
+	iterator begin()
+	{
+		return _start;
+	}
+
+	iterator end()
+	{
+		return _finish;
+	}
+
+	const_iterator begin() const
+	{
+		return _start;
+	}
+
+	const_iterator end() const
+	{
+		return _finish;
+	}
+
+	reverse_iterator rbegin()
+	{
+		return reverse_iterator(end());
+	}
+
+	reverse_iterator rend()
+	{
+		return reverse_iterator(begin());
+	}
+
+	iterator erase(const iterator &where)
+	{
+		return shiftElems(where + 1, -1);
+	}
+
+	iterator erase(const iterator &first, const iterator &last)
+	{
+		if (first == begin() && last == end()) {
+			clear();
+			return begin();
+		}
+
+		int shift = last - first;
+		return shiftElems(last, -shift);
+	}
+
+	iterator insert(iterator where, rvalue_reference data)
+	{
+		where = shiftElems(where, 1);
+		*where++ = gtl::move(data);
+		return where;
+	}
+
+	iterator insert(iterator where, const_reference data)
+	{
+		return insert(where, gtl::move(value_type(data)));
+	}
+
+	iterator insert(iterator where, size_type count, const_reference data)
+	{
+		where = shiftElems(where, count);
+		while (count-- > 0)
+		{
+			*where++ = data;
+		}
+		return where;
+	}
+
+	iterator insert(iterator where, std::initializer_list<value_type> list)
+	{
+		where = shiftElems(where, list.end() - list.begin());
+		for (std::initializer_list<value_type>::iterator itr = list.begin(); itr < list.end(); ++itr)
+		{
+			*where++ = *itr;
+		}
+		return where;
 	}
 
 protected:
@@ -177,7 +255,7 @@ protected:
 
 	iterator shiftElems(iterator pos, int shift)
 	{
-		size_t first = pos - begin();
+		size_type posIdx = pos - begin();
 		value_type *src = _start;
 		size_type newSize = size() + shift;
 
@@ -192,99 +270,20 @@ protected:
 				_end_of_storage = _start + newCapacity;
 				gtl::move(src, pos, _start);
 			}
-			else if {
-				for (size_t i = _size - 1; i >= first; --i)
-				{
-					_start[i + shift] = gtl::move(src[i]);
-				}
+			else {
+				iterator p = _finish - 1;
+				iterator q = _finish + shift - 1;
+
+				while (p >= pos)
+					*q-- = *p--;
 			}
-			
+
 			if (src != _start) {
 				delete[] src;
 			}
 		}
 		_finish = _start + newSize;
-		return begin() + first;
-	}
-
-public:
-
-	iterator begin()
-	{
-		return _start;
-	}
-
-	iterator end()
-	{
-		return _finish;
-	}
-
-	const_iterator begin() const
-	{
-		return _start;
-	}
-
-	const_iterator end() const
-	{
-		return _finish;
-	}
-
-	reverse_iterator rbegin()
-	{
-		return reverse_iterator(end());
-	}
-
-	reverse_iterator rend()
-	{
-		return reverse_iterator(begin());
-	}
-
-	void erase(const iterator &where)
-	{
-		shiftElems(where + 1, -1);
-	}
-
-	void erase(const iterator &first, const iterator &last)
-	{
-		if (first == begin() && last == end()) {
-			clear();
-			return;
-		}
-
-		int shift = last - first;
-		shiftElems(last, -shift);
-	}
-
-	iterator insert(iterator where, rvalue_reference data)
-	{
-		shiftElems(where, 1);
-		*where++ = gtl::move(data);
-		return where;
-	}
-
-	iterator insert(iterator where, const_reference data)
-	{
-		return insert(where, gtl::move(value_type(data)));
-	}
-
-	iterator insert(iterator where, size_type count, const_reference data)
-	{
-		shiftElems(where, count);
-		while (count-- > 0)
-		{
-			*where++ = data;
-		}
-		return where;
-	}
-
-	iterator insert(iterator where, std::initializer_list<value_type> list)
-	{
-		shiftElems(where, list.end() - list.begin());
-		for (std::initializer_list<value_type>::iterator itr = list.begin(); itr < list.end(); ++itr)
-		{
-			*where++ = *itr;
-		}
-		return where;
+		return begin() + posIdx;
 	}
 
 private:

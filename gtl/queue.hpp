@@ -14,7 +14,7 @@
 
 NS_BEGIN(gtl)
 
-template <typename ElemType>
+template <class ElemType>
 class queue
 {
 public:
@@ -181,7 +181,7 @@ private:
 	size_t _capacity{0};
 };
 
-template <typename ElemType, typename ContainerType = gtl::vector<ElemType>, typename ComparatorType = gtl::less<ContainerType::value_type>>
+template <class ElemType, class ContainerType = gtl::vector<ElemType>, class ComparatorType = gtl::less<ContainerType::value_type>>
 class priority_queue
 {
 public:
@@ -195,7 +195,7 @@ public:
 
 	}
 
-	template <typename InIterator>
+	template <class InIterator>
 	priority_queue(InIterator inBegin, InIterator inEnd) 
 		: c(inBegin, inEnd)
 	{

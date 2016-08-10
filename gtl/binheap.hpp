@@ -11,7 +11,7 @@
 
 NS_BEGIN(gtl)
 
-template <typename ElemType>
+template <class ElemType>
 class binheap
 {
 public:
