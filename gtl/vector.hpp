@@ -175,7 +175,7 @@ protected:
 		}
 	}
 
-	void shiftElems(iterator pos, int shift)
+	iterator shiftElems(iterator pos, int shift)
 	{
 		size_t first = pos - begin();
 		value_type *src = _start;
@@ -192,17 +192,19 @@ protected:
 				_end_of_storage = _start + newCapacity;
 				gtl::move(src, pos, _start);
 			}
-
-			for (size_t i = _size - 1; i >= first; --i)
-			{
-				_start[i + shift] = gtl::move(src[i]);
+			else if {
+				for (size_t i = _size - 1; i >= first; --i)
+				{
+					_start[i + shift] = gtl::move(src[i]);
+				}
 			}
-
+			
 			if (src != _start) {
 				delete[] src;
 			}
 		}
 		_finish = _start + newSize;
+		return begin() + first;
 	}
 
 public:
