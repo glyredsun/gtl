@@ -9,7 +9,6 @@ int main(void)
 	std::vector<int> sv2{ 4, 5, 6 };
 	
 	sv1 = std::move(sv2);
-	
 	struct S
 	{
 		int a;

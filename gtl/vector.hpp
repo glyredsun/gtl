@@ -113,7 +113,8 @@ public:
 	}
 
 	void reserve(size_type newCapacity) {
-		if (newCapacity <= size()) {
+		size_type curSize = size();
+		if (newCapacity <= curSize) {
 			return;
 		}
 
@@ -125,16 +126,19 @@ public:
 			delete[] _start;
 
 		_start = newStart;
+		_end_of_storage = _start + newCapacity;
+		_finish = _start + curSize;
 	}
 
 	void push_back(rvalue_reference data) {
-		resize(size() + 1);
-		*_finish = std::move(data);
+		if (_finish == _end_of_storage)
+			reserve(2 * size());
+
+		*_finish++ = gtl::move(data);
 	}
 
 	void push_back(const_reference data) {
-		resize(size() + 1);
-		*_finish = data;
+		push_back(gtl::move(value_type(data)));
 	}
 
 	void pop_back() {
@@ -187,8 +191,8 @@ public:
 			return begin();
 		}
 
-		int shift = last - first;
-		return shiftElems(last, -shift);
+		int shift = first - last;
+		return shiftElems(last, shift);
 	}
 
 	iterator insert(iterator where, rvalue_reference data)
