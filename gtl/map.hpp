@@ -11,8 +11,8 @@
 
 NS_BEGIN(gtl);
 
-template <class K, class V>
-class map : public avltree<gtl::pair<K, V>>
+template <class K, class V, class BaseType = avltree<gtl::pair<K, V>>>
+class map : public BaseType
 {
 public:
 	typedef gtl::pair<K, V> value_type;
