@@ -9,7 +9,6 @@
 int main(void)
 {
 	gtl::queue<int> q;
-
 	for (int i = 0; i < 128; i++)
 	{
 		q.push(i);

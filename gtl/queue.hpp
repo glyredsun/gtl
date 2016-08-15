@@ -185,7 +185,12 @@ template <class ElemType, class ContainerType = gtl::vector<ElemType>, class Com
 class priority_queue
 {
 public:
-	using value_type = typename ContainerType::value_type;
+	typedef priority_queue<ElemType, ContainerType, ComparatorType> _SelfType;
+	typedef typename ContainerType container_type;
+	typedef typename ContainerType::value_type value_type;
+	typedef typename ContainerType::size_type size_type;
+	typedef typename ContainerType::reference reference;
+	typedef typename ContainerType::const_reference const_reference;
 
 	priority_queue() {
 

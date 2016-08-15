@@ -57,11 +57,20 @@ int main(void)
 	{
 		std::cout << elem << std::endl;
 	}
+	gtl::vector<int> v1 = v;
 	gtl::sort_heap(v.begin(), v.end());
 	std::cout << "after sort_heap" << std::endl;
 	for (auto elem : v)
 	{
 		std::cout << elem << std::endl;
+	}
+
+	std::cout << "pop heap" << std::endl;
+	while (!v1.empty())
+	{
+		gtl::pop_heap(v1.begin(), v1.end());
+		std::cout << *v1.rbegin() << std::endl;
+		v1.pop_back();
 	}
 
 	system("pause");

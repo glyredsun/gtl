@@ -59,6 +59,21 @@ void shellSort(const Iterator &begin, const Iterator &end)
 	shellSort(begin, end, gtl::less<iterator_traits<Iterator>::value_type>());
 }
 
+template <class Iterator, class Comparator>
+void heapSort(const Iterator &begin, const Iterator &end, const Comparator &predicate)
+{
+	make_heap(begin, end, predicate);
+	sort_heap(begin, end, predicate);
+}
+
+template <class Iterator>
+void heapSort(const Iterator &begin, const Iterator &end)
+{
+	auto predicate = gtl::less<typename iterator_traits<Iterator>::value_type>();
+	make_heap(begin, end, predicate);
+	sort_heap(begin, end, predicate);
+}
+
 template <class Iterator, class BufIterator, class Comparator>
 void merge(Iterator begin, Iterator end, BufIterator bufBegin, const Comparator &lessThan)
 {
@@ -89,20 +104,28 @@ template <class Iterator, class BufIterator, class Comparator>
 void mergeSort(Iterator begin, Iterator end, BufIterator bufBegin, const Comparator &lessThan)
 {
 	int count = gtl::distance(begin, end);
-	if (count > 1) {
+	if (count > 16) {
 		Iterator center = begin + count / 2;
 		BufIterator bufCenter = bufBegin + count / 2;
 		mergeSort(begin, center, bufBegin, lessThan);
 		mergeSort(center, end, bufCenter, lessThan);
 		merge(begin, end, bufBegin, lessThan);
+	} else {
+		insertionSort(begin, end, lessThan);
 	}
 }
 
 template <class Iterator, class Comparator>
 void mergeSort(Iterator begin, Iterator end, const Comparator &lessThan)
 {
-	vector<iterator_traits<Iterator>::value_type> tmp(distance(begin, end));
-	mergeSort(begin, end, tmp.begin(), lessThan);
+	if (end - begin > 16) {
+		vector<iterator_traits<Iterator>::value_type> buf(distance(begin, end));
+		mergeSort(begin, end, buf.begin(), lessThan);
+	}
+	else {
+		insertionSort(begin, end);
+	}
+	
 }
 
 template <class Iterator>

@@ -155,18 +155,18 @@ struct less
 	}
 };
 
-template <class Iterator>
-void __percolateDown(Iterator begin, int len, int hole)
+template <class Iterator, class Comparator>
+inline void __percolateDown(Iterator begin, int len, int hole, const Comparator &predicate)
 {
 	typename iterator_traits<Iterator>::value_type tmp = gtl::move(*(begin + hole));
 	for (int child; hole * 2 + 1 <= len - 1; hole = child)
 	{
 		child = hole * 2 + 1;
 
-		if (child != len - 1 && *(begin + child) < *(begin + child + 1))
+		if (child != len - 1 && predicate(*(begin + child), *(begin + child + 1)))
 			++child;
 
-		if (tmp < *(begin + child))
+		if (predicate(tmp, *(begin + child)))
 			*(begin + hole) = gtl::move(*(begin + child));
 		else
 			break;
@@ -174,12 +174,12 @@ void __percolateDown(Iterator begin, int len, int hole)
 	*(begin + hole) = gtl::move(tmp);
 }
 
-template <class Iterator>
-void __percolateUp(Iterator begin, int hole)
+template <class Iterator, class Comparator>
+inline void __percolateUp(Iterator begin, int hole, const Comparator &predicate)
 {
 	typename iterator_traits<Iterator>::value_type tmp = gtl::move(*(begin + hole));
 	int parent = (hole - 1) / 2;
-	while (hole > 0 && *(begin + parent) < tmp)
+	while (hole > 0 && predicate(*(begin + parent), tmp))
 	{
 		*(begin + hole) = gtl::move(*(begin + parent));
 		hole = parent;
@@ -189,37 +189,62 @@ void __percolateUp(Iterator begin, int hole)
 	*(begin + hole) = gtl::move(tmp);
 }
 
-template <class Iterator>
-void make_heap(Iterator begin, Iterator end)
+template <class Iterator, class Comparator>
+inline void make_heap(Iterator begin, Iterator end, const Comparator &predicate)
 {
 	int len = end - begin;
 	for (int i = len / 2; i >= 0; --i)
 	{
-		__percolateDown(begin, len, i);
+		__percolateDown(begin, len, i, predicate);
 	}
 }
 
 template <class Iterator>
-void push_heap(Iterator begin, Iterator end)
+inline void make_heap(Iterator begin, Iterator end)
+{
+	make_heap(begin, end, gtl::less<typename iterator_traits<Iterator>::reference>());
+}
+
+template <class Iterator, class Comparator>
+inline void push_heap(Iterator begin, Iterator end, const Comparator &predicate)
 {
 	int len = end - begin;
-	__percolateUp(begin, len - 1);
+	__percolateUp(begin, len - 1, predicate);
 }
 
 template <class Iterator>
-void pop_heap(Iterator begin, Iterator end)
+inline void push_heap(Iterator begin, Iterator end)
+{
+	push_heap(begin, end, gtl::less<typename iterator_traits<Iterator>::reference>());
+}
+
+template <class Iterator, class Comparator>
+inline void pop_heap(Iterator begin, Iterator end, const Comparator &predicate)
 {
 	gtl::swap(*begin, *(end - 1));
-	__percolateDown(begin, end - begin - 1, 0);
+	__percolateDown(begin, end - begin - 1, 0, predicate);
 }
 
 template <class Iterator>
-void sort_heap(Iterator begin, Iterator end)
+inline void pop_heap(Iterator begin, Iterator end)
+{
+	pop_heap(begin, end, gtl::less<typename iterator_traits<Iterator>::reference>());
+}
+
+template <class Iterator, class Comparator>
+inline void sort_heap(Iterator begin, Iterator end, const Comparator &predicate)
 {
 	while (end - begin > 1)
 	{
-		pop_heap(begin, end--);
+		pop_heap(begin, end--, predicate);
 	}
+}
+
+template <class Iterator>
+inline void sort_heap(Iterator begin, Iterator end)
+{
+	typedef iterator_traits<Iterator>::reference reference;
+	sort_heap(begin, end, gtl::less<typename iterator_traits<Iterator>::reference>());
 }
 
 NS_END(gtl);

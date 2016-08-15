@@ -48,17 +48,23 @@ int main(void)
 
 	TimeCounter tc;
 
-	gtl::vector<int> vec4 = vec;
+	gtl::vector<int> vec5 = vec;
 	std::cout << "begin parallelize merge sort" << std::endl;
 	tc.reset();
-	gtl::mergeSortParallel(vec4.begin(), vec4.end());
+	gtl::mergeSortParallel(vec5.begin(), vec5.end());
 	std::cout << "parallelize merge sort cost " << tc.count() << "s" << std::endl;
 
-	gtl::vector<int> vec3 = vec;
+	gtl::vector<int> vec4 = vec;
 	std::cout << "begin merge sort" << std::endl;
 	tc.reset();
-	gtl::mergeSort(vec3.begin(), vec3.end());
+	gtl::mergeSort(vec4.begin(), vec4.end());
 	std::cout << "merge sort cost " << tc.count() << "s" << std::endl;
+
+	gtl::vector<int> vec3 = vec;
+	std::cout << "begin heap sort" << std::endl;
+	tc.reset();
+	gtl::heapSort(vec3.begin(), vec3.end());
+	std::cout << "heap sort cost " << tc.count() << "s" << std::endl;
 
 	gtl::vector<int> vec2 = vec;
 	std::cout << "begin shell sort" << std::endl;
@@ -78,7 +84,7 @@ int main(void)
 		if (i) {
 			assert(vec2[i] >= vec2[i - 1]);
 		}
-		assert(vec2[i] == vec3[i] && vec3[i] == vec4[i]);
+		assert(vec2[i] == vec3[i] && vec3[i] == vec4[i] && vec4[i] == vec5[i]);
 	}
 
 	gtl::vector<int>::iterator result = gtl::search(vec4.begin(), vec4.end(), 5999);
