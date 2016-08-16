@@ -252,7 +252,7 @@ void quickSort(RandomAccessIterator begin, RandomAccessIterator end, const Compa
 				break;
 		}
 
-		gtl::swap(begin[i], pivot);
+		gtl::swap(begin[i], begin[last - 1]);
 
 		quickSort(begin, begin + center, predicate);
 		quickSort(begin + center, begin + count, predicate);
