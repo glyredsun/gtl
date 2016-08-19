@@ -48,6 +48,12 @@ int main(void)
 
 	TimeCounter tc;
 
+	gtl::vector<int> vec6 = vec;
+	std::cout << "begin quick sort" << std::endl;
+	tc.reset();
+	gtl::mergeSortParallel(vec6.begin(), vec6.end());
+	std::cout << "quick sort cost " << tc.count() << "s" << std::endl;
+
 	gtl::vector<int> vec5 = vec;
 	std::cout << "begin parallelize merge sort" << std::endl;
 	tc.reset();
@@ -84,7 +90,7 @@ int main(void)
 		if (i) {
 			assert(vec2[i] >= vec2[i - 1]);
 		}
-		assert(vec2[i] == vec3[i] && vec3[i] == vec4[i] && vec4[i] == vec5[i]);
+		assert(vec2[i] == vec3[i] && vec3[i] == vec4[i] && vec4[i] == vec5[i] && vec5[i] == vec6[i]);
 	}
 
 	gtl::vector<int>::iterator result = gtl::search(vec4.begin(), vec4.end(), 5999);

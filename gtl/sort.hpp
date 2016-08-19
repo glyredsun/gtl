@@ -8,16 +8,16 @@
 
 NS_BEGIN(gtl)
 
-template <class Iterator, class Comparator>
-void insertionSort(const Iterator &begin, const Iterator &end, Comparator lessThan)
+template <class RandomAccessIterator, class Comparator>
+void insertionSort(const RandomAccessIterator &begin, const RandomAccessIterator &end, Comparator lessThan)
 {
 	if (begin == end) {
 		return;
 	}
 
-	Iterator j;
+	RandomAccessIterator j;
 
-	for (Iterator p = begin + 1; p != end; ++p)
+	for (RandomAccessIterator p = begin + 1; p != end; ++p)
 	{
 		auto tmp = gtl::move(*p);
 		for (j = p; j != begin && lessThan(tmp, *(j - 1)); --j)
@@ -28,14 +28,14 @@ void insertionSort(const Iterator &begin, const Iterator &end, Comparator lessTh
 	}
 }
 
-template <class Iterator>
-void insertionSort(const Iterator &begin, const Iterator &end)
+template <class RandomAccessIterator>
+void insertionSort(const RandomAccessIterator &begin, const RandomAccessIterator &end)
 {
-	insertionSort(begin, end, [](const decltype(*begin) &first, const decltype(*begin) second) { return first < second; });
+	insertionSort(begin, end, gtl::less<typename iterator_traits<RandomAccessIterator>::value_type>());
 }
 
-template <class Iterator, class Comparator>
-void shellSort(const Iterator &begin, const Iterator &end, Comparator lessThan)
+template <class RandomAccessIterator, class Comparator>
+void shellSort(const RandomAccessIterator &begin, const RandomAccessIterator &end, Comparator lessThan)
 {
 	for (int gap = (end - begin) / 2; gap > 0; gap /= 2)
 	{
@@ -53,35 +53,35 @@ void shellSort(const Iterator &begin, const Iterator &end, Comparator lessThan)
 	}
 }
 
-template <class Iterator>
-void shellSort(const Iterator &begin, const Iterator &end)
+template <class RandomAccessIterator>
+void shellSort(const RandomAccessIterator &begin, const RandomAccessIterator &end)
 {
-	shellSort(begin, end, gtl::less<iterator_traits<Iterator>::value_type>());
+	shellSort(begin, end, gtl::less<iterator_traits<RandomAccessIterator>::value_type>());
 }
 
-template <class Iterator, class Comparator>
-void heapSort(const Iterator &begin, const Iterator &end, const Comparator &predicate)
+template <class RandomAccessIterator, class Comparator>
+void heapSort(const RandomAccessIterator &begin, const RandomAccessIterator &end, const Comparator &predicate)
 {
 	make_heap(begin, end, predicate);
 	sort_heap(begin, end, predicate);
 }
 
-template <class Iterator>
-void heapSort(const Iterator &begin, const Iterator &end)
+template <class RandomAccessIterator>
+void heapSort(const RandomAccessIterator &begin, const RandomAccessIterator &end)
 {
-	auto predicate = gtl::less<typename iterator_traits<Iterator>::value_type>();
+	auto predicate = gtl::less<typename iterator_traits<RandomAccessIterator>::value_type>();
 	make_heap(begin, end, predicate);
 	sort_heap(begin, end, predicate);
 }
 
-template <class Iterator, class BufIterator, class Comparator>
-void merge(Iterator begin, Iterator end, BufIterator bufBegin, const Comparator &lessThan)
+template <class RandomAccessIterator, class BufIterator, class Comparator>
+void merge(RandomAccessIterator begin, RandomAccessIterator end, BufIterator bufBegin, const Comparator &lessThan)
 {
 	int count = gtl::distance(begin, end);
-	Iterator left = begin;
-	Iterator leftEnd = begin + count / 2;
-	Iterator right = leftEnd;
-	Iterator rightEnd = end;
+	RandomAccessIterator left = begin;
+	RandomAccessIterator leftEnd = begin + count / 2;
+	RandomAccessIterator right = leftEnd;
+	RandomAccessIterator rightEnd = end;
 	BufIterator bufCur = bufBegin;
 
 	while (left < leftEnd && right < rightEnd)
@@ -100,12 +100,12 @@ void merge(Iterator begin, Iterator end, BufIterator bufBegin, const Comparator 
 		*begin++ = gtl::move(*bufBegin++);
 }
 
-template <class Iterator, class BufIterator, class Comparator>
-void mergeSort(Iterator begin, Iterator end, BufIterator bufBegin, const Comparator &lessThan)
+template <class RandomAccessIterator, class BufIterator, class Comparator>
+void mergeSort(RandomAccessIterator begin, RandomAccessIterator end, BufIterator bufBegin, const Comparator &lessThan)
 {
 	int count = gtl::distance(begin, end);
 	if (count > 16) {
-		Iterator center = begin + count / 2;
+		RandomAccessIterator center = begin + count / 2;
 		BufIterator bufCenter = bufBegin + count / 2;
 		mergeSort(begin, center, bufBegin, lessThan);
 		mergeSort(center, end, bufCenter, lessThan);
@@ -115,11 +115,11 @@ void mergeSort(Iterator begin, Iterator end, BufIterator bufBegin, const Compara
 	}
 }
 
-template <class Iterator, class Comparator>
-void mergeSort(Iterator begin, Iterator end, const Comparator &lessThan)
+template <class RandomAccessIterator, class Comparator>
+void mergeSort(RandomAccessIterator begin, RandomAccessIterator end, const Comparator &lessThan)
 {
 	if (end - begin > 16) {
-		vector<iterator_traits<Iterator>::value_type> buf(distance(begin, end));
+		vector<iterator_traits<RandomAccessIterator>::value_type> buf(distance(begin, end));
 		mergeSort(begin, end, buf.begin(), lessThan);
 	}
 	else {
@@ -128,16 +128,16 @@ void mergeSort(Iterator begin, Iterator end, const Comparator &lessThan)
 	
 }
 
-template <class Iterator>
-void mergeSort(Iterator begin, Iterator end)
+template <class RandomAccessIterator>
+void mergeSort(RandomAccessIterator begin, RandomAccessIterator end)
 {
-	mergeSort(begin, end, [](const decltype(*begin) &left, const decltype(*begin) &right) { return left < right; });
+	mergeSort(begin, end, gtl::less<typename iterator_traits<RandomAccessIterator>::value_type>());
 }
 
-template <class Iterator, class Comparator>
-void mergeSortParallel(Iterator begin, Iterator end, const Comparator &lessThan)
+template <class RandomAccessIterator, class Comparator>
+void mergeSortParallel(RandomAccessIterator begin, RandomAccessIterator end, const Comparator &predicate)
 {
-	typedef vector<iterator_traits<Iterator>::value_type> BufType;
+	typedef vector<iterator_traits<RandomAccessIterator>::value_type> BufType;
 	BufType tmp(distance(begin, end));
 	BufType::iterator bufBegin = tmp.begin();
 
@@ -156,7 +156,7 @@ void mergeSortParallel(Iterator begin, Iterator end, const Comparator &lessThan)
 		for (unsigned int i = 0; i < slices; ++i)
 		{
 			auto func = [=]() {
-				mergeSort(begin + i * countPerSlice, begin + (i + 1) * countPerSlice, bufBegin + i * countPerSlice, lessThan);
+				mergeSort(begin + i * countPerSlice, begin + (i + 1) * countPerSlice, bufBegin + i * countPerSlice, predicate);
 			};
 			if (i < newThreadsNum) {
 				// do work in new thread
@@ -184,7 +184,7 @@ void mergeSortParallel(Iterator begin, Iterator end, const Comparator &lessThan)
 			for (unsigned int i = 0; i < slices; ++i)
 			{
 				auto func = [=]() {
-					merge(begin + i * countPerSlice, begin + (i + 1) * countPerSlice, bufBegin + i * countPerSlice, lessThan);
+					merge(begin + i * countPerSlice, begin + (i + 1) * countPerSlice, bufBegin + i * countPerSlice, predicate);
 				};
 				if (i < newThreadsNum) {
 					threadsVec[i] = gtl::move(std::thread(func));
@@ -201,14 +201,70 @@ void mergeSortParallel(Iterator begin, Iterator end, const Comparator &lessThan)
 		}
 	}
 	else {
-		mergeSort(begin, end, tmp.begin(), lessThan);
+		mergeSort(begin, end, tmp.begin(), predicate);
 	}
 }
 
-template <class Iterator>
-void mergeSortParallel(Iterator begin, Iterator end)
+template <class RandomAccessIterator>
+void mergeSortParallel(RandomAccessIterator begin, RandomAccessIterator end)
 {
-	mergeSortParallel(begin, end, [](const decltype(*begin) &left, const decltype(*begin) &right) { return left < right; });
+	mergeSortParallel(begin, end, gtl::less<typename iterator_traits<RandomAccessIterator>::value_type>());
+}
+
+template <class RandomAccessIterator, class Comparator>
+void quickSort(RandomAccessIterator begin, RandomAccessIterator end, const Comparator &predicate)
+{
+	auto count = gtl::distance(begin, end);
+	
+	if (count >= 10) {
+
+		auto first = 0;
+		auto center = count / 2;
+		auto last = count - 1;
+
+		if (predicate(begin[center], begin[first])) {
+			gtl::swap(begin[center], begin[first]);
+		}
+
+		if (predicate(begin[last], begin[first])) {
+			gtl::swap(begin[last], begin[first]);
+		}
+
+		if (predicate(begin[last], begin[center])) {
+			gtl::swap(begin[last], begin[center]);
+		}
+
+		gtl::swap(begin[center], begin[last - 1]);
+
+		const auto &pivot = begin[last - 1];
+
+		auto i = first;
+		auto j = last - 1;
+
+		while (true)
+		{
+			while (predicate(begin[++i]), pivot);
+			while (predicate(pivot, begin[--j]));
+			
+			if (i < j)
+				gtl::swap(begin[i], begin[j]);
+			else
+				break;
+		}
+
+		gtl::swap(begin[i], begin[last - 1]);
+
+		quickSort(begin, begin + center, predicate);
+		quickSort(begin + center, begin + count, predicate);
+	}
+	else
+		insertionSort(begin, end, predicate);
+}
+
+template <class RandomAccessIterator>
+void quickSort(RandomAccessIterator begin, RandomAccessIterator end)
+{
+	quickSort(begin, end, gtl::less<>(typename gtl::iterator_traits<RandomAccessIterator>::value_type));
 }
 
 NS_END(gtl)
