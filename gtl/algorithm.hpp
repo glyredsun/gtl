@@ -141,7 +141,7 @@ inline const T& min(const T& a, const T& b)
 }
 
 template <class Iterator>
-typename iterator_traits<Iterator>::defference_type distance(const Iterator first, const Iterator last)
+typename iterator_traits<Iterator>::difference_type distance(const Iterator first, const Iterator last)
 {
 	return last - first;
 }
@@ -155,6 +155,7 @@ struct less
 	}
 };
 
+// heap algorithm
 template <class Iterator, class Comparator>
 inline void __percolateDown(Iterator begin, int len, int hole, const Comparator &predicate)
 {

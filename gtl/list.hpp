@@ -7,6 +7,7 @@
 
 #include <macros.hpp>
 #include <type_traits.hpp>
+#include <iterator.hpp>
 
 #include <initializer_list>
 
@@ -193,8 +194,17 @@ public:
 
 	class iterator
 	{
-		friend class list;
+		friend list;
 	public:
+
+		typedef ElemType value_type;
+		typedef ptrdiff_t difference_type;
+		typedef ElemType* pointer;
+		typedef const ElemType* const_pointer;
+		typedef ElemType& reference;
+		typedef const ElemType& const_reference;
+		typedef bidirectional_iterator_tag iterator_category;
+
 		iterator(Node *n) :n(n) {}
 		iterator(const iterator& other) : iterator(other.n) {}
 
@@ -244,24 +254,24 @@ public:
 			return iterator(node);
 		}
 
-		ElemType& operator *()
+		reference operator *()
 		{
 			return n->elem;
 		}
 
-		const ElemType& operator *() const
+		const_reference operator *() const
 		{
 			return n->elem;
 		}
 
-		ElemType& operator ->()
+		pointer operator ->()
 		{
-			return n->elem;
+			return &n->elem;
 		}
 
-		const ElemType& operator ->() const
+		const_pointer operator ->() const
 		{
-			return n->elem;
+			return &n->elem;
 		}
 
 		bool operator == (const iterator& other)
@@ -281,23 +291,7 @@ public:
 		Node *n;
 	};
 
-	class reverse_iterator : public iterator
-	{
-	public:
-		reverse_iterator& operator ++()
-		{
-			n = n->prev;
-			return *this;
-		}
-
-		reverse_iterator operator ++(int)
-		{
-			reverse_iterator copy(*this);
-			n = n->prev;
-			return copy;
-		}
-
-	};
+	typedef reverse_iterator<iterator> reverse_iterator;
 
 public:
 	iterator begin() {
@@ -309,11 +303,11 @@ public:
 	}
 
 	reverse_iterator rbegin() {
-		return iterator(_head.prev);
+		return reverse_iterator(end());
 	}
 
 	reverse_iterator rend() {
-		return iterator(&_head);
+		return reverse_iterator(begin());
 	}
 
 	void insert(const iterator &where, const ElemType &&elem) {

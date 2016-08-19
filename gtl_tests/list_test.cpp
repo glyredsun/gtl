@@ -6,6 +6,19 @@
 
 #include <list>
 #include <assert.h>
+
+
+struct S1 {
+	int a;
+	std::string b;
+};
+
+std::ostream& operator <<(std::ostream &out, const S1 s)
+{
+	out << s.a << ", " << s.b.c_str();
+	return out;
+}
+
 int main(void)
 {
 	gtl::list<int> *il = new gtl::list<int>;
@@ -49,6 +62,20 @@ int main(void)
 	il2.push_back(6);
 	il2 = *il;
 	gtl::list<int> *il3 = new gtl::list<int>(std::move(*il));
+
+	
+	gtl::list<S1> s1l;
+	s1l.push_back({ 1, "a" });
+	s1l.push_back({ 2, "b" });
+	s1l.push_back({ 3, "c" });
+	for (gtl::list<S1>::iterator it = s1l.begin(); it != s1l.end(); ++it)
+	{
+		std::cout << it->a << ", " << it->b.c_str() << std::endl;
+	}
+	for (gtl::list<S1>::reverse_iterator it = s1l.rbegin(); it != s1l.rend(); ++it)
+	{
+		std::cout << it->a << ", " << it->b.c_str() << std::endl;
+	}
 
 
 	std::cout << "before delete il" << std::endl;

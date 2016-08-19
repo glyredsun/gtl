@@ -18,7 +18,7 @@ public:
 	typedef reverse_iterator<iterator_type> _SelfType;
 
 	typedef typename iterator_traits<iterator_type>::value_type value_type;
-	typedef typename iterator_traits<iterator_type>::defference_type defference_type;
+	typedef typename iterator_traits<iterator_type>::difference_type difference_type;
 	typedef typename iterator_traits<iterator_type>::pointer pointer;
 	typedef typename iterator_traits<iterator_type>::reference reference;
 	typedef typename iterator_traits<iterator_type>::iterator_category iterator_category;
@@ -49,7 +49,7 @@ public:
 
 	pointer operator->()
 	{
-		return &(*this);
+		return &(this->operator*());
 	}
 
 	_SelfType& operator++()
@@ -78,29 +78,29 @@ public:
 		return tmp;
 	}
 
-	_SelfType operator+(defference_type n) const
+	_SelfType operator+(difference_type n) const
 	{
 		return _SelfType(_current - n);
 	}
 
-	_SelfType operator+=(defference_type n)
+	_SelfType operator+=(difference_type n)
 	{
 		_current -= n;
 		return *this;
 	}
 
-	_SelfType operator-(defference_type n) const
+	_SelfType operator-(difference_type n) const
 	{
 		return _SelfType(_current + n);
 	}
 
-	_SelfType operator-=(defference_type n)
+	_SelfType operator-=(difference_type n)
 	{
 		_current += n;
 		return *this;
 	}
 
-	reference operator[](defference_type n) const
+	reference operator[](difference_type n) const
 	{
 		return *(*this + n);
 	}
