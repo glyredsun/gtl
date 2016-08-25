@@ -42,3 +42,6 @@ include_directories(type_traits_test ${gtl_dir})
 
 add_executable(algorithm_test algorithm_test.cpp)
 include_directories(algorithm_test ${gtl_dir})
+
+add_executable(graph_test graph_test.cpp)
+include_directories(graph_test ${gtl_dir})
