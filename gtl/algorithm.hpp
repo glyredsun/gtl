@@ -74,29 +74,40 @@ inline OutIterator copy(InIterator srcBegin, InIterator srcEnd, OutIterator dest
 
 // binary search
 template <class Iterator, class DataType, class Comparator>
-inline Iterator search(Iterator begin, Iterator end, const DataType &target, Comparator &lessThan)
+inline Iterator search(Iterator begin, Iterator end, const DataType &target, Comparator &predicate)
 {
-	Iterator endCopy = end;
-	Iterator middle;
+	auto count = gtl::distance(begin, end);
+	int middle, left = 0, right = count - 1;
 
-	while (begin < end) {
-		middle = begin + (end - begin)/2;
-		if (lessThan(*middle, target)) {
-			begin = middle;
-		} else if (lessThan(target, *middle)) {
-			end = middle;
-		} else {
-			return middle;
-		}
+	while (left <= right) {
+		middle = (left + right)/2;
+		if (predicate(begin[middle], target))
+			left = middle + 1;
+		else if (predicate(target, begin[middle]))
+			right = middle - 1;
+		else
+			return begin + middle;
 	}
 
-	return endCopy;
+	return end;
 }
 
 template <class Iterator, class DataType>
 inline Iterator search(Iterator begin, Iterator end, const DataType &target)
 {
 	return search(begin, end, target, gtl::less<typename iterator_traits<Iterator>::value_type>());
+}
+
+template <class DataType, size_t size, class Comparator>
+inline size_t search(const DataType (&arr)[size], const DataType &target, const Comparator &predicate)
+{
+	return search(&arr[0], &arr[size], target, predicate) - &arr[0];
+}
+
+template <class DataType, size_t size>
+inline size_t search(const DataType (&arr)[size], const DataType &target)
+{
+	return search(&arr[0], &arr[size], target, gtl::less<DataType>()) - &arr[0];
 }
 
 // get the power of two number big than num
@@ -141,7 +152,7 @@ inline const T& min(const T& a, const T& b)
 }
 
 template <class Iterator>
-typename iterator_traits<Iterator>::difference_type distance(const Iterator first, const Iterator last)
+typename iterator_traits<Iterator>::difference_type distance(const Iterator &first, const Iterator &last)
 {
 	return last - first;
 }
