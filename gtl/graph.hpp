@@ -22,10 +22,28 @@ public:
 	typedef CantainerType container_type;
 	typedef EdgeContainerType edge_container_type;
 	typedef typename container_type::size_type index_type;
+	typedef typename container_type::size_type size_type;
 	typedef pair<NodeType, EdgeContainerType> value_type;
+
+	friend std::ostream& operator<< (std::ostream& o, const sparse_graph& g)
+	{
+		auto c = g.container();
+		for (size_t i = 0, len = c.size(); i < len; ++i)
+		{
+			auto value = c[i];
+			o << i << ", [";
+			for (auto edge : value.second)
+			{
+				o << edge.to() << " ";
+			}
+			o << "]" << std::endl;
+		}
+		return o;
+	}
 
 	const container_type& container() const { return container_; }
 	const edge_container_type& edges(index_type idx) const { return container_[idx].second; }
+	size_type size() const { return container_.size(); }
 
 	void add_node(const node_type& node) { container_.push_back(value_type(node, edge_container_type())); }
 	void add_edge(const edge_type& edge) { container_[edge.from()].second.push_back(edge); }
@@ -33,23 +51,6 @@ public:
 protected:
 	container_type container_;
 };
-
-template <class NodeType, class EdgeType, class EdgeContainerType = list<EdgeType>, class CantainerType = vector<pair<NodeType, EdgeContainerType>>>
-std::ostream& operator<< (std::ostream& o, const sparse_graph<NodeType, EdgeType, EdgeContainerType, CantainerType>& g)
-{
-	auto c = g.container();
-	for (size_t i = 0, len = c.size(); i < len; ++i)
-	{
-		auto value = c[i];
-		o << i << ", [";
-		for (auto edge : value.second)
-		{
-			o << edge.to() << " ";
-		}
-		o << "]" << std::endl;
-	}
-	return o;
-}
 
 NS_END(gtl);
 
