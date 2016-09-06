@@ -41,6 +41,14 @@ public:
 		_finish = _start + initSize;
 	}
 
+	vector(size_type initSize, const value_type &data) : vector(initSize)
+	{
+		for (iterator itr = begin(); itr != end(); ++itr)
+		{
+			*itr = data;
+		}
+	}
+
 	vector(std::initializer_list<value_type> args)
 		: vector(args.size())
 	{

@@ -35,7 +35,7 @@ public:
 
 	bool found() const { return found_; }
 
-	const PathContainerType path() const
+	const PathContainerType& path() const
 	{
 		if (found_ && path_container_.empty())
 		{
@@ -61,23 +61,36 @@ protected:
 
 		s.push(&dummy);
 
+		std::cout << g_;
+
 		while (!s.empty())
 		{
 			const edge_type* next = s.top();
-			visited_[next->to()] = visited;
-			route_[next->to()] = next->from();
+			s.pop();
+			auto to = next->to();
+			auto from = next->from();
+			visited_[to] = visited;
+			route_[to] = from;
 
 			if (next->to() == target_)
 			{
 				return true;
 			}
 
-			for (auto edge : g.edges())
-			{
-				if (visited_[edge.to()] == unvisited)
+
+			auto edge = g_.edges(from);
+
+			if (!edge.empty()) {
+				for (auto &edge : g_.edges(from))
 				{
-					s.push(&edge);
+					if (visited_[edge.to()] == unvisited)
+					{
+						s.push(&edge);
+					}
 				}
+			}
+			else {
+				std::cout << "it 's empty" << std::endl;
 			}
 		}
 

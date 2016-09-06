@@ -42,7 +42,9 @@ public:
 	}
 
 	const container_type& container() const { return container_; }
-	const edge_container_type& edges(index_type idx) const { return container_[idx].second; }
+	const edge_container_type& edges(index_type idx) const { 
+		return container_[idx].second;
+	}
 	size_type size() const { return container_.size(); }
 
 	void add_node(const node_type& node) { container_.push_back(value_type(node, edge_container_type())); }

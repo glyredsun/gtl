@@ -124,15 +124,15 @@ protected:
 
 
 		Node(const ElemType &&elem, Node *prev = nullptr, Node *next = nullptr) : elem(elem), prev(prev), next(next) {
-			printf("%s %p\n", __FUNCTION__, this);
+			//printf("%s %p\n", __FUNCTION__, this);
 		}
 
 		Node(const ElemType &elem, Node *prev = nullptr, Node *next = nullptr) : elem(elem), prev(prev), next(next) {
-			printf("%s %p\n", __FUNCTION__, this);
+			//printf("%s %p\n", __FUNCTION__, this);
 		}
 
 		~Node() {
-			printf("%s %p\n", __FUNCTION__, this);
+			//printf("%s %p\n", __FUNCTION__, this);
 		}
 	};
 
@@ -205,6 +205,7 @@ public:
 		typedef const ElemType& const_reference;
 		typedef bidirectional_iterator_tag iterator_category;
 
+		iterator() {}
 		iterator(Node *n) :n(n) {}
 		iterator(const iterator& other) : iterator(other.n) {}
 
@@ -288,10 +289,98 @@ public:
 		}
 
 	private:
-		Node *n;
+		Node *n{nullptr};
 	};
 
 	typedef reverse_iterator<iterator> reverse_iterator;
+	
+	class const_iterator
+	{
+		friend list;
+	public:
+
+		typedef ElemType value_type;
+		typedef size_t difference_type;
+		typedef const value_type* pointer;
+		typedef const value_type& reference;
+		typedef bidirectional_iterator_tag iterator_category;
+
+		const_iterator() {}
+		const_iterator(const Node *n) :n(n) {}
+		const_iterator(const const_iterator& other) : const_iterator(other.n) {}
+
+		const_iterator& operator ++()
+		{
+			n = n->next;
+			return *this;
+		}
+
+		const_iterator operator ++(int)
+		{
+			const_iterator copy(*this);
+			++*this;
+			return copy;
+		}
+
+		const_iterator& operator --()
+		{
+			n = n->prev;
+			return *this;
+		}
+
+		const_iterator operator --(int)
+		{
+			const_iterator copy(*this);
+			--*this;
+			return copy;
+		}
+
+		const_iterator operator +(difference_type count)
+		{
+			const Node *node = n;
+			while (count-- > 0)
+			{
+				node = node->next;
+			}
+			return const_iterator(node);
+		}
+
+		const_iterator operator -(difference_type count)
+		{
+			const Node *node = n;
+			while (count-- > 0)
+			{
+				node = node->prev;
+			}
+			return const_iterator(node);
+		}
+
+		reference operator *() const
+		{
+			return n->elem;
+		}
+
+		pointer operator ->() const
+		{
+			return &n->elem;
+		}
+
+		bool operator == (const const_iterator& other)
+		{
+			if (&other == this)
+				return true;
+
+			return n == other.n;
+		}
+
+		bool operator != (const const_iterator& other)
+		{
+			return !(*this == other);
+		}
+
+	private:
+		const Node *n{ nullptr };
+	};
 
 public:
 	iterator begin() {
@@ -300,6 +389,14 @@ public:
 
 	iterator end() {
 		return iterator(&_head);
+	}
+
+	const_iterator begin() const {
+		return const_iterator(_head.next);
+	}
+
+	const_iterator end() const {
+		return const_iterator(&_head);
 	}
 
 	reverse_iterator rbegin() {

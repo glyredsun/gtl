@@ -27,7 +27,8 @@ struct GraphEdge
 
 int main(void)
 {
-	gtl::sparse_graph<GraphNode, GraphEdge> g;
+	typedef gtl::sparse_graph<GraphNode, GraphEdge> graph_type;
+	graph_type g;
 	
 	g.add_node(GraphNode(0));
 	g.add_node(GraphNode(1));
@@ -38,6 +39,17 @@ int main(void)
 	g.add_edge(GraphEdge(0, 1));
 
 	std::cout << g;
+
+	gtl::graphsearch_dfs<graph_type> pathFinder(g, 0 , 1);
+
+	if (pathFinder.found()) {
+		std::cout << "found!" << std::endl;
+	}
+	else {
+		std::cout << "not found!" << std::endl;
+	}
+	
+	system("pause");
 
 	return 0;
 }
