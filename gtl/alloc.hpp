@@ -5,6 +5,8 @@
 #ifndef _ALLOC_HPP_
 #define _ALLOC_HPP_
 
+#include <memory.hpp>
+
 template <class Type>
 class allocator
 {
@@ -31,32 +33,37 @@ public:
 
 	pointer allocate(size_type n, const void *)
 	{
-		return n > 0 ? static_cast<pointer>(malloc(sizeof(value_type) * n)) : nullptr;
+		return gtl::allocate(n);
 	}
 	
 	void construct(pointer p)
 	{
-		new(p) value_type();
+		gtl::construct(p);
 	}
 
 	void construct(pointer p, const_reference val)
 	{
-		new(p) value_type(val);
+		gtl::construct(p, val);
 	}
 
 	void construct(pointer p, rvalue_reference val)
 	{
-		new(p) value_type(val);
+		gtl::construct(p, val);
 	}
 
 	void destroy(pointer p)
 	{
-		p->~value_type();
+		gtl::destroy(p);
+	}
+
+	void destroy(pointer first, pointer last)
+	{
+		gtl::destroy(first, last);
 	}
 
 	void deallocate(pointer p)
 	{
-		free(p);
+		gtl::deallocate(p);
 	}
 };
 

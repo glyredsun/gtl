@@ -126,12 +126,12 @@ public:
 			return;
 		}
 
-		value_type *newStart = new value_type[newCapacity];
+		//value_type *newStart = new value_type[newCapacity];
+		value_type *newStart = _alloc.allocate(newCapacity);
 
-		gtl::move(_start, _finish, newStart);
-
-		if (_start)
-			delete[] _start;
+		uninitialized_copy(_start, _finish, newStart);
+		
+		freeMomery();
 
 		_start = newStart;
 		_end_of_storage = _start + newCapacity;
@@ -142,7 +142,8 @@ public:
 		if (_finish == _end_of_storage)
 			reserve(2 * size());
 
-		*_finish++ = gtl::move(data);
+		//*_finish++ = gtl::move(data);
+		_alloc.construct(_finish++, data);
 	}
 
 	void push_back(const_reference data) {
@@ -150,7 +151,8 @@ public:
 	}
 
 	void pop_back() {
-		--_finish;
+		_alloc.destroy(_finish--);
+		//--_finish;
 	}
 
 	void clear() {
@@ -260,7 +262,8 @@ protected:
 	void freeMomery()
 	{
 		if (_start) {
-			delete[] _start;
+			_alloc.destroy(_start, _finish);
+			_alloc.deallocate(_start);
 			_start = _finish = _end_of_storage = nullptr;
 		}
 	}
@@ -273,6 +276,7 @@ protected:
 
 		if (shift < 0) {
 			gtl::move(pos, _finish, pos + shift);
+			_alloc.destroy(_finish + shift, _finish);
 		}
 		else if (shift > 0) {
 
