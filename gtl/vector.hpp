@@ -121,29 +121,26 @@ public:
 	}
 
 	void reserve(size_type newCapacity) {
-		size_type curSize = size();
-		if (newCapacity <= curSize) {
+		
+		if (newCapacity <= size()) {
 			return;
 		}
 
-		//value_type *newStart = new value_type[newCapacity];
 		value_type *newStart = _alloc.allocate(newCapacity);
 
-		uninitialized_copy(_start, _finish, newStart);
+		_finish = uninitialized_copy(_start, _finish, newStart);
 		
 		freeMomery();
 
 		_start = newStart;
 		_end_of_storage = _start + newCapacity;
-		_finish = _start + curSize;
 	}
 
 	void push_back(rvalue_reference data) {
 		if (_finish == _end_of_storage)
 			reserve(2 * size());
 
-		//*_finish++ = gtl::move(data);
-		_alloc.construct(_finish++, data);
+		_alloc.construct(_finish++, gtl::move(data));
 	}
 
 	void push_back(const_reference data) {
@@ -151,8 +148,7 @@ public:
 	}
 
 	void pop_back() {
-		_alloc.destroy(_finish--);
-		//--_finish;
+		_alloc.destroy(--_finish);
 	}
 
 	void clear() {
