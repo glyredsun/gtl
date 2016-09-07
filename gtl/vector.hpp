@@ -266,8 +266,7 @@ protected:
 
 	iterator shiftElems(iterator pos, int shift)
 	{
-		size_type posIdx = pos - begin();
-		value_type *src = _start;
+		
 		size_type newSize = size() + shift;
 
 		if (shift < 0) {
@@ -276,25 +275,34 @@ protected:
 		}
 		else if (shift > 0) {
 
+			size_type posIdx = pos - begin();
+			
 			if (newSize > capacity()) {
+
 				size_type newCapacity = newSize * 2;
-				_start = new value_type[newCapacity];
+				iterator newStart = _alloc.allocate(newCapacity);
+				uninitialized_copy(_start, pos, newStart);
+				uninitialized_copy(pos, _finish, newStart + posIdx + shift);
+
+				for (int i = posIdx; i < posIdx + shift; ++i)
+					_alloc.construct(&*(newStart + i));
+
+				freeMomery();
+				_start = newStart;
 				_end_of_storage = _start + newCapacity;
-				gtl::move(src, pos, _start);
 			}
 			else {
 				iterator p = _finish - 1;
 				iterator q = _finish + shift - 1;
 
+				while (q >= _finish)
+					_alloc.construct(&*q--, *p--);
+
 				while (p >= pos)
 					*q-- = *p--;
 			}
-
-			if (src != _start) {
-				delete[] src;
-			}
 		}
-		_finish = _start + newSize;
+		_finish = begin() + newSize;
 		return begin() + posIdx;
 	}
 
