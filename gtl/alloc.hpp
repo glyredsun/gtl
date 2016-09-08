@@ -31,9 +31,9 @@ public:
 	template <class U> allocator(const allocator<U>&) noexcept {}
 	~allocator() noexcept {}
 
-	pointer allocate(size_type n, const void *)
+	pointer allocate(size_type n, const void *p = nullptr)
 	{
-		return gtl::allocate(n);
+		return gtl::allocate<value_type>(n, p);
 	}
 	
 	void construct(pointer p)

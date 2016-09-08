@@ -140,7 +140,7 @@ public:
 		if (_finish == _end_of_storage)
 			reserve(2 * size());
 
-		_alloc.construct(_finish++, gtl::move(data));
+		_alloc.construct(&*_finish++, gtl::move(data));
 	}
 
 	void push_back(const_reference data) {
@@ -148,7 +148,7 @@ public:
 	}
 
 	void pop_back() {
-		_alloc.destroy(--_finish);
+		_alloc.destroy(*&--_finish);
 	}
 
 	void clear() {
@@ -268,6 +268,7 @@ protected:
 	{
 		
 		size_type newSize = size() + shift;
+		size_type posIdx = pos - begin();
 
 		if (shift < 0) {
 			gtl::move(pos, _finish, pos + shift);
@@ -275,16 +276,14 @@ protected:
 		}
 		else if (shift > 0) {
 
-			size_type posIdx = pos - begin();
-			
 			if (newSize > capacity()) {
 
 				size_type newCapacity = newSize * 2;
-				iterator newStart = _alloc.allocate(newCapacity);
+				iterator newStart = _alloc.allocate(newCapacity, NULL);
 				uninitialized_copy(_start, pos, newStart);
 				uninitialized_copy(pos, _finish, newStart + posIdx + shift);
 
-				for (int i = posIdx; i < posIdx + shift; ++i)
+				for (size_type i = posIdx; i < posIdx + shift; ++i)
 					_alloc.construct(&*(newStart + i));
 
 				freeMomery();

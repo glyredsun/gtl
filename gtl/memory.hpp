@@ -5,6 +5,9 @@
 #ifndef _MEMORY_HPP_
 #define _MEMORY_HPP_
 
+#include <type_traits.hpp>
+#include <new.h>
+
 NS_BEGIN(gtl);
 
 template <typename T>
@@ -28,19 +31,19 @@ private:
 };
 
 template <class T, class Size>
-T* allocate(Size n, const void *)
+inline T* allocate(Size n, const void *)
 {
 	return n > 0 ? static_cast<T*>(malloc(sizeof(T) * n)) : nullptr;
 }
 
 template <class T>
-inline void deallocate(T* data)
+inline void deallocate(T* p)
 {
-	free(data);
+	free(p);
 }
 
 template <class T>
-void construct(T* p)
+inline void construct(T* p)
 {
 	new(p) T();
 }
@@ -52,9 +55,9 @@ inline void construct(T1* p, const T2& value)
 }
 
 template <class T1, class T2>
-void construct(T1* p, T2&& val)
+inline void construct(T1* p, T2&& val)
 {
-	new(p) T1(val);
+	new (p) T1(val);
 }
 
 template <class T>
@@ -64,19 +67,19 @@ inline void destroy(T *p)
 }
 
 template <class Iterator>
-void destroy(Iterator first, Iterator last)
+inline void destroy(Iterator first, Iterator last)
 {
-	_destroy(first, last, type_traits<value_type>::has_trivial_destructor());
+	__destroy(first, last, type_traits<iterator_traits<Iterator>::value_type>::has_trivial_destructor());
 }
 
 template <class Iterator>
-void __destroy(Iterator first, Iterator last, __true_type)
+inline void __destroy(Iterator first, Iterator last, __true_type)
 {
 	// do nothing
 }
 
 template <class Iterator>
-void __destroy(Iterator first, Iterator last, __false_type)
+inline void __destroy(Iterator first, Iterator last, __false_type)
 {
 	while (first < last)
 	{
@@ -84,26 +87,20 @@ void __destroy(Iterator first, Iterator last, __false_type)
 	}
 }
 
-template <class T>
-void deallocate(T* p)
-{
-	free(p);
-}
-
 template <class InputIterator, class ForwardIterator>
-ForwardIterator uninitialized_copy(InputIterator first, InputIterator last, ForwardIterator result)
+inline ForwardIterator uninitialized_copy(InputIterator first, InputIterator last, ForwardIterator result)
 {
 	return __uninitialized_copy(first, last, result, type_traits<iterator_traits<ForwardIterator>::value_type>::has_trivial_default_constructor());
 }
 
 template <class InputIterator, class ForwardIterator>
-ForwardIterator __uninitialized_copy(InputIterator first, InputIterator last, ForwardIterator result, __true_type)
+inline ForwardIterator __uninitialized_copy(InputIterator first, InputIterator last, ForwardIterator result, __true_type)
 {
-	return ::memcpy(result, first, last - first);
+	return gtl::copy(first, last, result);
 }
 
 template <class InputIterator, class ForwardIterator>
-ForwardIterator __uninitialized_copy(InputIterator first, InputIterator last, ForwardIterator result, __false_type)
+inline ForwardIterator __uninitialized_copy(InputIterator first, InputIterator last, ForwardIterator result, __false_type)
 {
 	while (first < last)
 	{
@@ -113,13 +110,13 @@ ForwardIterator __uninitialized_copy(InputIterator first, InputIterator last, Fo
 }
 
 template <class ForwardIterator, class T>
-void uninitialized_fill(ForwardIterator first, ForwardIterator last, const T& value)
+inline void uninitialized_fill(ForwardIterator first, ForwardIterator last, const T& value)
 {
 	__uninitialized_fill(first, last, value, type_traits<iterator_traits<ForwardIterator>::value_type>::has_trivial_default_constructor());
 }
 
 template <class ForwardIterator, class T>
-void __uninitialized_fill(ForwardIterator first, ForwardIterator last, const T& value, __true_type)
+inline void __uninitialized_fill(ForwardIterator first, ForwardIterator last, const T& value, __true_type)
 {
 	while (first != last)
 	{
@@ -128,7 +125,7 @@ void __uninitialized_fill(ForwardIterator first, ForwardIterator last, const T& 
 }
 
 template <class ForwardIterator, class T>
-void __uninitialized_fill(ForwardIterator first, ForwardIterator last, const T& value, __false_type)
+inline void __uninitialized_fill(ForwardIterator first, ForwardIterator last, const T& value, __false_type)
 {
 	while (first != last)
 	{
@@ -137,13 +134,13 @@ void __uninitialized_fill(ForwardIterator first, ForwardIterator last, const T& 
 }
 
 template <class ForwardIterator, class Size, class T>
-void uninitialized_fill_n(ForwardIterator first, Size n, const T& value)
+inline void uninitialized_fill_n(ForwardIterator first, Size n, const T& value)
 {
 	__uninitialized_fill_n(first, n, value, type_traits<iterator_traits<ForwardIterator>::value_type>::has_trivial_default_constructor());
 }
 
 template <class ForwardIterator, class Size, class T>
-void __uninitialized_fill_n(ForwardIterator first, Size n, const T& value, __true_type)
+inline void __uninitialized_fill_n(ForwardIterator first, Size n, const T& value, __true_type)
 {
 	while (n-- > 0)
 	{
@@ -152,7 +149,7 @@ void __uninitialized_fill_n(ForwardIterator first, Size n, const T& value, __tru
 }
 
 template <class ForwardIterator, class Size, class T>
-void __uninitialized_fill_n(ForwardIterator first, Size n, const T& value, __false_type)
+inline void __uninitialized_fill_n(ForwardIterator first, Size n, const T& value, __false_type)
 {
 	while (n-- > 0)
 	{
