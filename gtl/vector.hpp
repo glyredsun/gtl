@@ -126,13 +126,13 @@ public:
 			return;
 		}
 
-		value_type *newStart = _alloc.allocate(newCapacity);
-
-		_finish = uninitialized_copy(_start, _finish, newStart);
+		iterator newStart = _alloc.allocate(newCapacity);
+		iterator newFinish = gtl::uninitialized_copy(_start, _finish, newStart);
 		
 		freeMomery();
 
 		_start = newStart;
+		_finish = newFinish;
 		_end_of_storage = _start + newCapacity;
 	}
 
@@ -223,6 +223,12 @@ public:
 		return where;
 	}
 
+	iterator insert(iterator where, iterator first, iterator last)
+	{
+		where = shiftElems(where, last - first);
+		return gtl::copy(first, last, where);
+	}
+
 	iterator insert(iterator where, std::initializer_list<value_type> list)
 	{
 		where = shiftElems(where, list.end() - list.begin());
@@ -270,18 +276,19 @@ protected:
 		size_type newSize = size() + shift;
 		size_type posIdx = pos - begin();
 
-		if (shift < 0) {
+		if (shift < 0)
+		{
 			gtl::move(pos, _finish, pos + shift);
 			_alloc.destroy(_finish + shift, _finish);
 		}
-		else if (shift > 0) {
-
-			if (newSize > capacity()) {
-
+		else if (shift > 0)
+		{
+			if (newSize > capacity())
+			{
 				size_type newCapacity = newSize * 2;
 				iterator newStart = _alloc.allocate(newCapacity, NULL);
-				uninitialized_copy(_start, pos, newStart);
-				uninitialized_copy(pos, _finish, newStart + posIdx + shift);
+				gtl::uninitialized_copy(_start, pos, newStart);
+				gtl::uninitialized_copy(pos, _finish, newStart + posIdx + shift);
 
 				for (size_type i = posIdx; i < posIdx + shift; ++i)
 					_alloc.construct(&*(newStart + i));
@@ -290,7 +297,8 @@ protected:
 				_start = newStart;
 				_end_of_storage = _start + newCapacity;
 			}
-			else {
+			else
+			{
 				iterator p = _finish - 1;
 				iterator q = _finish + shift - 1;
 

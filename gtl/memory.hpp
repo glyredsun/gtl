@@ -45,19 +45,19 @@ inline void deallocate(T* p)
 template <class T>
 inline void construct(T* p)
 {
-	new(p) T();
+	::new(p) T();
 }
 
 template <class T1, class T2>
 inline void construct(T1* p, const T2& value)
 {
-	new (p) T1(value);
+	::new(p) T1(value);
 }
 
 template <class T1, class T2>
 inline void construct(T1* p, T2&& val)
 {
-	new (p) T1(val);
+	::new (p) T1(val);
 }
 
 template <class T>
@@ -104,7 +104,7 @@ inline ForwardIterator __uninitialized_copy(InputIterator first, InputIterator l
 {
 	while (first < last)
 	{
-		construct(&*result++, &*first++);
+		construct(&*result++, *first++);
 	}
 	return result;
 }
