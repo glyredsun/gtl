@@ -224,6 +224,12 @@ public:
 		return gtl::copy(first, last, where);
 	}
 
+	const_iterator insert(iterator where, const_iterator first, const_iterator last)
+	{
+		where = shiftElems(where, last - first);
+		return gtl::copy(first, last, where);
+	}
+
 	iterator insert(iterator where, std::initializer_list<value_type> list)
 	{
 		where = shiftElems(where, list.end() - list.begin());
@@ -245,7 +251,7 @@ protected:
 
 		resize(other.size());
 
-		gtl::move(other._start, other._finish, _start);
+		gtl::copy(other._start, other._finish, _start);
 	}
 
 	void moveFrom(vector&& other)
@@ -281,7 +287,7 @@ protected:
 			if (newSize > capacity())
 			{
 				size_type newCapacity = newSize * 2;
-				iterator newStart = _alloc.allocate(newCapacity, NULL);
+				iterator newStart = _alloc.allocate(newCapacity, nullptr);
 				gtl::uninitialized_copy(_start, pos, newStart);
 				gtl::uninitialized_copy(pos, _finish, newStart + posIdx + shift);
 
