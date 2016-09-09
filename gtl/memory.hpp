@@ -57,7 +57,7 @@ inline void construct(T1* p, const T2& value)
 template <class T1, class T2>
 inline void construct(T1* p, T2&& val)
 {
-	::new (p) T1(val);
+	::new (p) T1(gtl::move(val));
 }
 
 template <class T>

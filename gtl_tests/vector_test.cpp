@@ -139,12 +139,22 @@ int main(void)
 	gtl::vector<int> vCopy(v);
 	std::cout << "\ncopy content\n";
 	print(vCopy.begin(), vCopy.end());
-
+	
 	{
 		gtl::vector<S> vs;
 		vs.push_back({ 1, 2 });
 		vs.push_back({ 3, 4 });
 		std::cout << "\nvs content\n";
+		print(vs.begin(), vs.end());
+		std::cout << "\nvs before push_back again\n";
+		vs.push_back({ 9, 10 });
+		vs.push_back({ 11, 12 });
+		std::cout << "\nvs after push_back again\n";
+		print(vs.begin(), vs.end());
+		std::cout << "\nvs before insert\n";
+		vs.insert(vs.begin() + 2, { 5, 6 });
+		vs.insert(vs.begin() + 3, { 7, 8 });
+		std::cout << "\nvs after insert\n";
 		print(vs.begin(), vs.end());
 	}
 	
