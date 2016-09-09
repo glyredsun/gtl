@@ -140,7 +140,7 @@ public:
 		if (_finish == _end_of_storage)
 			reserve(2 * size());
 
-		_alloc.construct(&*_finish++, gtl::move(data));
+		gtl::construct(&*_finish++, gtl::move(data));
 	}
 
 	void push_back(const_reference data) {
@@ -148,11 +148,11 @@ public:
 	}
 
 	void pop_back() {
-		_alloc.destroy(*&--_finish);
+		gtl::destroy(&*--_finish);
 	}
 
 	void clear() {
-		_finish = _start;
+		erase(begin(), end());
 	}
 
 	iterator begin()
@@ -192,11 +192,6 @@ public:
 
 	iterator erase(const iterator &first, const iterator &last)
 	{
-		if (first == begin() && last == end()) {
-			clear();
-			return begin();
-		}
-
 		int shift = first - last;
 		return shiftElems(last, shift);
 	}
@@ -264,7 +259,7 @@ protected:
 	void freeMomery()
 	{
 		if (_start) {
-			_alloc.destroy(_start, _finish);
+			gtl::destroy(_start, _finish);
 			_alloc.deallocate(_start);
 			_start = _finish = _end_of_storage = nullptr;
 		}
@@ -279,7 +274,7 @@ protected:
 		if (shift < 0)
 		{
 			gtl::move(pos, _finish, pos + shift);
-			_alloc.destroy(_finish + shift, _finish);
+			gtl::destroy(_finish + shift, _finish);
 		}
 		else if (shift > 0)
 		{
@@ -291,7 +286,7 @@ protected:
 				gtl::uninitialized_copy(pos, _finish, newStart + posIdx + shift);
 
 				for (size_type i = posIdx; i < posIdx + shift; ++i)
-					_alloc.construct(&*(newStart + i));
+					gtl::construct(&*(newStart + i));
 
 				freeMomery();
 				_start = newStart;
@@ -303,7 +298,7 @@ protected:
 				iterator q = _finish + shift - 1;
 
 				while (q >= _finish)
-					_alloc.construct(&*q--, *p--);
+					gtl::construct(&*q--, *p--);
 
 				while (p >= pos)
 					*q-- = *p--;

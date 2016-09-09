@@ -36,31 +36,6 @@ public:
 		return gtl::allocate<value_type>(n, p);
 	}
 	
-	void construct(pointer p)
-	{
-		gtl::construct(p);
-	}
-
-	void construct(pointer p, const_reference val)
-	{
-		gtl::construct(p, val);
-	}
-
-	void construct(pointer p, rvalue_reference val)
-	{
-		gtl::construct(p, val);
-	}
-
-	void destroy(pointer p)
-	{
-		gtl::destroy(p);
-	}
-
-	void destroy(pointer first, pointer last)
-	{
-		gtl::destroy(first, last);
-	}
-
 	void deallocate(pointer p)
 	{
 		gtl::deallocate(p);
