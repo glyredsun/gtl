@@ -177,6 +177,10 @@ int main(void)
 	std::cout << "\nafter pop_back()\n";
 	print(vstr.begin(), vstr.end());
 
+	vstr.resize(vstr.size() * 2, "!!!!!!!!!!");
+	std::cout << "\nafter resize\n";
+	print(vstr.begin(), vstr.end());
+
 	std::cout << "\n";
 	system("pause");
 	return 0;

@@ -110,51 +110,55 @@ inline ForwardIterator __uninitialized_copy(InputIterator first, InputIterator l
 }
 
 template <class ForwardIterator, class T>
-inline void uninitialized_fill(ForwardIterator first, ForwardIterator last, const T& value)
+inline ForwardIterator uninitialized_fill(ForwardIterator first, ForwardIterator last, const T& value)
 {
-	__uninitialized_fill(first, last, value, type_traits<iterator_traits<ForwardIterator>::value_type>::has_trivial_default_constructor());
+	return __uninitialized_fill(first, last, value, type_traits<iterator_traits<ForwardIterator>::value_type>::has_trivial_default_constructor());
 }
 
 template <class ForwardIterator, class T>
-inline void __uninitialized_fill(ForwardIterator first, ForwardIterator last, const T& value, __true_type)
+inline ForwardIterator __uninitialized_fill(ForwardIterator first, ForwardIterator last, const T& value, __true_type)
 {
 	while (first != last)
 	{
 		*first++ = value;
 	}
+	return first;
 }
 
 template <class ForwardIterator, class T>
-inline void __uninitialized_fill(ForwardIterator first, ForwardIterator last, const T& value, __false_type)
+inline ForwardIterator __uninitialized_fill(ForwardIterator first, ForwardIterator last, const T& value, __false_type)
 {
 	while (first != last)
 	{
 		construct(&*first++, value);
 	}
+	return first;
 }
 
 template <class ForwardIterator, class Size, class T>
-inline void uninitialized_fill_n(ForwardIterator first, Size n, const T& value)
+inline ForwardIterator uninitialized_fill_n(ForwardIterator first, Size n, const T& value)
 {
-	__uninitialized_fill_n(first, n, value, type_traits<iterator_traits<ForwardIterator>::value_type>::has_trivial_default_constructor());
+	return __uninitialized_fill_n(first, n, value, type_traits<iterator_traits<ForwardIterator>::value_type>::has_trivial_default_constructor());
 }
 
 template <class ForwardIterator, class Size, class T>
-inline void __uninitialized_fill_n(ForwardIterator first, Size n, const T& value, __true_type)
+inline ForwardIterator __uninitialized_fill_n(ForwardIterator first, Size n, const T& value, __true_type)
 {
 	while (n-- > 0)
 	{
 		*first++ = value;
 	}
+	return first;
 }
 
 template <class ForwardIterator, class Size, class T>
-inline void __uninitialized_fill_n(ForwardIterator first, Size n, const T& value, __false_type)
+inline ForwardIterator __uninitialized_fill_n(ForwardIterator first, Size n, const T& value, __false_type)
 {
 	while (n-- > 0)
 	{
 		construct(&*first++, value);
 	}
+	return first;
 }
 
 NS_END(gtl);

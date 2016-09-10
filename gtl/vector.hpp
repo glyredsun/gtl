@@ -113,11 +113,22 @@ public:
 		return _end_of_storage - _start;
 	}
 
-	void resize(size_type newSize) {
-		if (newSize > capacity()) {
-			reserve(newSize * 2);
+	void resize(size_type newSize, const value_type& fillValue) {
+		
+		if (newSize < size()) {
+			gtl::destroy(_finish + newSize - size(), _finish);
+			_finish = _start + newSize;
 		}
-		_finish = _start + newSize;
+		else if (newSize > size()) {
+			if (newSize > capacity()) {
+				reserve(newSize * 2);
+			}
+			_finish = gtl::uninitialized_fill_n(_finish, newSize - size(), fillValue);
+		}
+	}
+
+	void resize(size_type newSize) {
+		resize(newSize, value_type());
 	}
 
 	void reserve(size_type newCapacity) {
