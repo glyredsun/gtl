@@ -104,6 +104,24 @@ public:
 		delete backNode;
 	}
 
+	void reverse()
+	{
+		Node head = _head;
+		head.next->prev = head.prev->next = &head;
+		
+		_head.next = _head.prev = &_head;
+		
+		for (Node *cur = head.next; cur != &head;)
+		{
+			Node *next = cur->next;
+			_head.next->prev = cur;
+			cur->next = _head.next;
+			cur->prev = &_head;
+			_head.next = cur;
+			cur = next;
+		}
+	}
+
 	void clear()
 	{
 		freeMemory(_head.next, &_head);
