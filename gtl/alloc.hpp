@@ -7,6 +7,8 @@
 
 #include <memory.hpp>
 
+GTL_BEGIN_NS
+
 template <class Type>
 class allocator
 {
@@ -41,5 +43,7 @@ public:
 		gtl::deallocate(p);
 	}
 };
+
+GTL_END_NS
 
 #endif // !_ALLOC_HPP_

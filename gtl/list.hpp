@@ -8,15 +8,235 @@
 #include <macros.hpp>
 #include <type_traits.hpp>
 #include <iterator.hpp>
+#include <alloc.hpp>
 
 #include <initializer_list>
 
 NS_BEGIN(gtl);
 
-template <class ElemType>
+template <class DataType>
+struct __list_node
+{
+	DataType data;
+	__list_node *prev;
+	__list_node *next;
+};
+
+template <class DataType>
+class __list_iterator
+{
+public:
+
+	typedef DataType value_type;
+	typedef __list_node<value_type> node_type;
+	typedef ptrdiff_t difference_type;
+	typedef DataType* pointer;
+	typedef const DataType* const_pointer;
+	typedef DataType& reference;
+	typedef const DataType& const_reference;
+	typedef bidirectional_iterator_tag iterator_category;
+	typedef __list_node<DataType> node_type;
+
+	__list_iterator() {}
+	__list_iterator(node_type *n) :n(n) {}
+	__list_iterator(const __list_iterator& other) : __list_iterator(other.n) {}
+
+	__list_iterator& operator ++()
+	{
+		n = n->next;
+		return *this;
+	}
+
+	__list_iterator operator ++(int)
+	{
+		__list_iterator copy(*this);
+		++*this;
+		return copy;
+	}
+
+	__list_iterator& operator --()
+	{
+		n = n->prev;
+		return *this;
+	}
+
+	__list_iterator operator --(int)
+	{
+		__list_iterator copy(*this);
+		--*this;
+		return copy;
+	}
+
+	__list_iterator operator +(int count)
+	{
+		node_type *node = n;
+		while (count-- > 0)
+		{
+			node = node->next;
+		}
+		return __list_iterator(node);
+	}
+
+	__list_iterator operator -(int count)
+	{
+		node_type *node = n;
+		while (count-- > 0)
+		{
+			node = node->prev;
+		}
+		return __list_iterator(node);
+	}
+
+	reference operator *()
+	{
+		return n->data;
+	}
+
+	const_reference operator *() const
+	{
+		return n->data;
+	}
+
+	pointer operator ->()
+	{
+		return &n->data;
+	}
+
+	const_pointer operator ->() const
+	{
+		return &n->data;
+	}
+
+	bool operator == (const __list_iterator& other)
+	{
+		if (&other == this)
+			return true;
+
+		return n == other.n;
+	}
+
+	bool operator != (const __list_iterator& other)
+	{
+		return !(*this == other);
+	}
+
+	node_type* node() {
+		return n;
+	}
+
+	const node_type* node() const {
+		return n;
+	}
+
+private:
+	node_type *n{ nullptr };
+};
+
+template <class DataType>
+class __list_const_iterator
+{
+public:
+
+	typedef DataType value_type;
+	typedef __list_node<value_type> node_type;
+	typedef size_t difference_type;
+	typedef const value_type* pointer;
+	typedef const value_type& reference;
+	typedef bidirectional_iterator_tag iterator_category;
+
+	__list_const_iterator() {}
+	__list_const_iterator(const node_type *n) :n(n) {}
+	__list_const_iterator(const __list_const_iterator& other) : __list_const_iterator(other.n) {}
+
+	__list_const_iterator& operator ++()
+	{
+		n = n->next;
+		return *this;
+	}
+
+	__list_const_iterator operator ++(int)
+	{
+		__list_const_iterator copy(*this);
+		++*this;
+		return copy;
+	}
+
+	__list_const_iterator& operator --()
+	{
+		n = n->prev;
+		return *this;
+	}
+
+	__list_const_iterator operator --(int)
+	{
+		__list_const_iterator copy(*this);
+		--*this;
+		return copy;
+	}
+
+	__list_const_iterator operator +(difference_type count)
+	{
+		const node_type *node = n;
+		while (count-- > 0)
+		{
+			node = node->next;
+		}
+		return __list_const_iterator(node);
+	}
+
+	__list_const_iterator operator -(difference_type count)
+	{
+		const node_type *node = n;
+		while (count-- > 0)
+		{
+			node = node->prev;
+		}
+		return __list_const_iterator(node);
+	}
+
+	reference operator *() const
+	{
+		return n->data;
+	}
+
+	pointer operator ->() const
+	{
+		return &n->data;
+	}
+
+	bool operator == (const __list_const_iterator& other)
+	{
+		if (&other == this)
+			return true;
+
+		return n == other.n;
+	}
+
+	bool operator != (const __list_const_iterator& other)
+	{
+		return !(*this == other);
+	}
+
+private:
+	const node_type *n{ nullptr };
+};
+
+template <class DataType, class Allocate = gtl::allocator<__list_node<DataType>>>
 class list
 {
 public:
+
+	typedef DataType value_type;
+	typedef value_type* pointer;
+	typedef value_type& reference;
+	typedef const value_type* const_pointer;
+	typedef const value_type& const_reference;
+	typedef value_type&& rvalue_reference;
+	typedef __list_node<DataType> node_type;
+	typedef __list_iterator<DataType> iterator;
+	typedef reverse_iterator<iterator> reverse_iterator;
+	typedef __list_const_iterator<DataType> const_iterator;
+	typedef gtl::reverse_iterator<const_iterator> const_reverse_iterator;
 
 	list()
 	{
@@ -30,18 +250,18 @@ public:
 
 	list(const list &other)
 	{
-		copyFrom(other);
+		assign(other);
 	}
 
 	list(list &&other)
 	{
-		moveFrom(gtl::move(other));
+		assign(gtl::move(other));
 	}
 
 	list& operator =(const list &other)
 	{
 		if (this != &other) {
-			copyFrom(other);
+			assign(other);
 		}
 		return *this;
 	}
@@ -49,71 +269,121 @@ public:
 	list& operator =(list &&other)
 	{
 		if (this != &other) {
-			moveFrom(gtl::move(other));
+			assign(gtl::move(other));
 		}
 		return *this;
 	}
 
-	void push_back(const ElemType &elem)
+	void assign(const list& other)
 	{
-		Node *newNode = new Node(elem, _head.prev, &_head);
+		if (other.empty()) {
+			clear();
+			return;
+		}
+
+		node_type *p = other._head.next;
+		node_type *n = _head.next;
+
+		while (n != &_head && p != &other._head)
+		{
+			n->data = p->data;
+			n = n->next;
+			p = p->next;
+		}
+
+		if (n != &_head) {
+			n->prev->next = &_head;
+			_head.prev = n->prev;
+			freeMemory(n, &_head);
+		}
+
+		while (p != &other._head) {
+			push_back(p->data);
+			p = p->next;
+		}
+	}
+
+	void assign(list &&other)
+	{
+		clear();
+
+		if (other.empty()) {
+			return;
+		}
+
+		_head.next = other._head.next;
+		_head.prev = other._head.prev;
+		other._head.next->prev = &_head;
+		other._head.prev->next = &_head;
+
+		other._head.next = &other._head;
+		other._head.prev = &other._head;
+	}
+
+	void push_back(const_reference elem)
+	{
+		node_type *newNode = createNode(elem);
+		newNode->prev = _head.prev;
+		newNode->next = &_head;
 		_head.prev->next = newNode;
 		_head.prev = newNode;
 	}
 
-	void push_front(const ElemType &elem)
+	void push_front(const_reference elem)
 	{
-		Node *newNode = new Node(elem, &_head, _head.next);
+		node_type *newNode = createNode(elem);
+		newNode->prev = &_head;
+		newNode->next = _head.next;
 		_head.next->prev = newNode;
 		_head.next = newNode;
 	}
 
-	ElemType &front()
+	reference front()
 	{
-		return _head.next->elem;
+		return _head.next->data;
 	}
 
-	const ElemType &front() const
+	const_reference front() const
 	{
-		return _head.next->elem;
+		return _head.next->data;
 	}
 
-	ElemType &back()
+	reference back()
 	{
-		return _head.prev->elem;
+		return _head.prev->data;
 	}
 
-	const ElemType &back() const
+	const_reference back() const
 	{
-		return _head.prev->elem;
+		return _head.prev->data;
 	}
 
 	void pop_front()
 	{
-		Node *frontNode = _head.next;
+		node_type *frontNode = _head.next;
 		_head.next = frontNode->next;
 		frontNode->next->prev = &_head;
-		delete frontNode;
+		destroyNode(frontNode);
 	}
 
 	void pop_back()
 	{
-		Node *backNode = _head.prev;
+		node_type *backNode = _head.prev;
 		_head.prev = backNode->prev;
 		backNode->prev->next = &_head;
-		delete backNode;
+		destroyNode(backNode);
 	}
 
 	void reverse()
 	{
-		Node head = _head;
+		node_type head = _head;
 		head.next->prev = head.prev->next = &head;
 		
 		_head.next = _head.prev = &_head;
 		
-		for (Node *cur = head.next; cur != &head;)
+		for (node_type *cur = head.next; cur != &head;)
 		{
-			Node *next = cur->next;
+			node_type *next = cur->next;
 			_head.next->prev = cur;
 			cur->next = _head.next;
 			cur->prev = &_head;
@@ -133,274 +403,6 @@ public:
 		return _head.next == &_head;
 	}
 
-protected:
-
-	struct Node {
-		ElemType elem;
-		Node *prev;
-		Node *next;
-
-
-		Node(const ElemType &&elem, Node *prev = nullptr, Node *next = nullptr) : elem(elem), prev(prev), next(next) {
-			//printf("%s %p\n", __FUNCTION__, this);
-		}
-
-		Node(const ElemType &elem, Node *prev = nullptr, Node *next = nullptr) : elem(elem), prev(prev), next(next) {
-			//printf("%s %p\n", __FUNCTION__, this);
-		}
-
-		~Node() {
-			//printf("%s %p\n", __FUNCTION__, this);
-		}
-	};
-
-	void freeMemory(Node *first, Node *head)
-	{
-		for (Node *p = first, *n = p->next; p != head; p = n, n = p->next) {
-			delete p;
-		}
-	}
-
-	void copyFrom(const list& other) 
-	{
-		if (other.empty()) {
-			clear();
-			return;
-		}
-
-		Node *p = other._head.next;
-		Node *n = _head.next;
-
-		while (n != &_head && p != &other._head)
-		{
-			n->elem = p->elem;
-			n = n->next;
-			p = p->next;
-		}
-
-		if (n != &_head) {
-			n->prev->next = &_head;
-			_head.prev = n->prev;
-			freeMemory(n, &_head);
-		}
-
-		while (p != &other._head) {
-			push_back(p->elem);
-			p = p->next;
-		}
-	}
-
-	void moveFrom(list &&other)
-	{
-		clear();
-
-		if (other.empty()) {
-			return;
-		}
-
-		_head.next = other._head.next;
-		_head.prev = other._head.prev;
-		other._head.next->prev = &_head;
-		other._head.prev->next = &_head;
-
-		other._head.next = &other._head;
-		other._head.prev = &other._head;
-	}
-
-
-public:
-
-	class iterator
-	{
-		friend list;
-	public:
-
-		typedef ElemType value_type;
-		typedef ptrdiff_t difference_type;
-		typedef ElemType* pointer;
-		typedef const ElemType* const_pointer;
-		typedef ElemType& reference;
-		typedef const ElemType& const_reference;
-		typedef bidirectional_iterator_tag iterator_category;
-
-		iterator() {}
-		iterator(Node *n) :n(n) {}
-		iterator(const iterator& other) : iterator(other.n) {}
-
-		iterator& operator ++()
-		{
-			n = n->next;
-			return *this;
-		}
-
-		iterator operator ++(int)
-		{
-			iterator copy(*this);
-			++*this;
-			return copy;
-		}
-
-		iterator& operator --()
-		{
-			n = n->prev;
-			return *this;
-		}
-
-		iterator operator --(int)
-		{
-			iterator copy(*this);
-			--*this;
-			return copy;
-		}
-
-		iterator operator +(int count)
-		{
-			Node *node = n;
-			while (count-- > 0)
-			{
-				node = node->next;
-			}
-			return iterator(node);
-		}
-
-		iterator operator -(int count)
-		{
-			Node *node = n;
-			while (count-- > 0)
-			{
-				node = node->prev;
-			}
-			return iterator(node);
-		}
-
-		reference operator *()
-		{
-			return n->elem;
-		}
-
-		const_reference operator *() const
-		{
-			return n->elem;
-		}
-
-		pointer operator ->()
-		{
-			return &n->elem;
-		}
-
-		const_pointer operator ->() const
-		{
-			return &n->elem;
-		}
-
-		bool operator == (const iterator& other)
-		{
-			if (&other == this)
-				return true;
-
-			return n == other.n;
-		}
-
-		bool operator != (const iterator& other)
-		{
-			return !(*this == other);
-		}
-
-	private:
-		Node *n{nullptr};
-	};
-
-	typedef reverse_iterator<iterator> reverse_iterator;
-	
-	class const_iterator
-	{
-		friend list;
-	public:
-
-		typedef ElemType value_type;
-		typedef size_t difference_type;
-		typedef const value_type* pointer;
-		typedef const value_type& reference;
-		typedef bidirectional_iterator_tag iterator_category;
-
-		const_iterator() {}
-		const_iterator(const Node *n) :n(n) {}
-		const_iterator(const const_iterator& other) : const_iterator(other.n) {}
-
-		const_iterator& operator ++()
-		{
-			n = n->next;
-			return *this;
-		}
-
-		const_iterator operator ++(int)
-		{
-			const_iterator copy(*this);
-			++*this;
-			return copy;
-		}
-
-		const_iterator& operator --()
-		{
-			n = n->prev;
-			return *this;
-		}
-
-		const_iterator operator --(int)
-		{
-			const_iterator copy(*this);
-			--*this;
-			return copy;
-		}
-
-		const_iterator operator +(difference_type count)
-		{
-			const Node *node = n;
-			while (count-- > 0)
-			{
-				node = node->next;
-			}
-			return const_iterator(node);
-		}
-
-		const_iterator operator -(difference_type count)
-		{
-			const Node *node = n;
-			while (count-- > 0)
-			{
-				node = node->prev;
-			}
-			return const_iterator(node);
-		}
-
-		reference operator *() const
-		{
-			return n->elem;
-		}
-
-		pointer operator ->() const
-		{
-			return &n->elem;
-		}
-
-		bool operator == (const const_iterator& other)
-		{
-			if (&other == this)
-				return true;
-
-			return n == other.n;
-		}
-
-		bool operator != (const const_iterator& other)
-		{
-			return !(*this == other);
-		}
-
-	private:
-		const Node *n{ nullptr };
-	};
-
-public:
 	iterator begin() {
 		return iterator(_head.next);
 	}
@@ -425,51 +427,100 @@ public:
 		return reverse_iterator(begin());
 	}
 
-	void insert(const iterator &where, const ElemType &&elem) {
-		Node *newNode = new Node(elem);
-		newNode->next = where.n;
-		newNode->prev = where.n->prev;
-		where.n->prev->next = newNode;
-		where.n->prev = newNode;
+	const_reverse_iterator rbegin() const {
+		return const_reverse_iterator(end());
 	}
 
-	void insert(const iterator &where, const ElemType &elem) {
-		insert(where, gtl::move(ElemType(elem)));
+	const_reverse_iterator rend() const {
+		return const_reverse_iterator(begin());
 	}
 
-	void insert(const iterator &where, size_t count, const ElemType &elem) {
+	void insert(iterator &where, rvalue_reference elem) {
+		node_type *newNode = createNode(elem);
+		node_type* n = where.node();
+		newNode->next = n;
+		newNode->prev = n->prev;
+		n->prev->next = newNode;
+		n->prev = newNode;
+	}
+
+	void insert(iterator &where, const_reference elem) {
+		node_type *newNode = createNode(elem);
+		node_type* n = where.node();
+		newNode->next = n;
+		newNode->prev = n->prev;
+		n->prev->next = newNode;
+		n->prev = newNode;
+	}
+
+	void insert(const iterator &where, size_t count, const_reference elem) {
 		while (count-- > 0)
 		{
 			insert(where, elem);
 		}
 	}
 
-	void insert(const iterator &where, std::initializer_list<ElemType> list)
+	void insert(iterator &where, std::initializer_list<DataType> list)
 	{
-		for (const ElemType &elem : list)
+		for (const DataType &elem : list)
 		{
 			insert(where, gtl::move(elem));
 		}
 	}
 
-	void erase(const iterator &where)
+	void erase(iterator &where)
 	{
-		Node *n = where.n;
+		node_type *n = where.node();
 		n->next->prev = n->prev;
 		n->prev->next = n->next;
-		delete n;
+		destroyNode(n);
 	}
 
-	void erase(const iterator &first, const iterator &last)
+	void erase(iterator &first, iterator &last)
 	{
-		first.n->prev->next = last.n;
-		last.n->prev = first.n->prev;
+		node_type* n1 = first.node();
+		node_type* n2 = last.node();
+		n1->prev->next = n2;
+		n2->prev = n1->prev;
 
-		freeMemory(first.n, last.n);
+		freeMemory(n1, n2);
+	}
+
+protected:
+
+	void freeMemory(node_type *first, node_type *head)
+	{
+		for (node_type *p = first, *n = p->next; p != head; p = n, n = p->next) {
+			destroyNode(p);
+		}
+	}
+
+	node_type* createNode() {
+		node_type* node = _alloc.allocate(1);
+		construct(&node->data);
+		return node;
+	}
+
+	node_type* createNode(const_reference data) {
+		node_type* node = _alloc.allocate(1);
+		construct(&node->data, data);
+		return node;
+	}
+
+	node_type* createNode(rvalue_reference data) {
+		node_type* node = _alloc.allocate(1);
+		construct(&node->data, data);
+		return node;
+	}
+
+	void destroyNode(node_type* node) {
+		destroy(&node->data);
+		_alloc.deallocate(node);
 	}
 
 private:
-	Node _head{ElemType(), &_head, &_head};
+	Allocate _alloc;
+	node_type _head{DataType(), &_head, &_head};
 };
 
 
