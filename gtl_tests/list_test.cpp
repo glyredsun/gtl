@@ -3,10 +3,29 @@
 #include <list.h>
 
 #include <iostream>
+#include <string>
 
 #include <list>
 #include <assert.h>
 
+template <class Iterator>
+void print(Iterator first, Iterator last)
+{
+	bool flag = false;
+	while (first != last)
+	{
+		if (flag)
+		{
+			std::cout << ", ";
+		}
+		else
+		{
+			flag = true;
+		}
+		std::cout << *first++;
+	}
+	std::cout << std::endl;
+}
 
 struct S1 {
 	int a;
@@ -15,7 +34,7 @@ struct S1 {
 
 std::ostream& operator <<(std::ostream &out, const S1 s)
 {
-	out << s.a << ", " << s.b.c_str();
+	out << "(" << s.a << ", " << s.b << ")";
 	return out;
 }
 
@@ -38,19 +57,14 @@ int main(void)
 	il->insert(--it2, {11111, 22222, 33333, 44444});
 
 	std::cout << "traverse il by iterator" << std::endl;
-	for (gtl::list<int>::iterator it = il->begin(); it != il->end(); ++it)
-	{
-		std::cout << *it << std::endl;
-	}
+	print(il->begin(), il->end());
 
 	std::cout << "erase1" << std::endl;
 	il->erase(il->begin() + 1, il->begin() + 3);
-	
-	for (gtl::list<int>::iterator it = il->begin(); it != il->end(); ++it)
-	{
-		std::cout << *it << std::endl;
-	}
-
+	print(il->begin(), il->end());
+	std::cout << "reverse il" << std::endl;
+	il->reverse();
+	print(il->begin(), il->end());
 
 	gtl::list<int> il1(*il);
 	gtl::list<int> il2;
@@ -63,20 +77,12 @@ int main(void)
 	il2 = *il;
 	gtl::list<int> *il3 = new gtl::list<int>(std::move(*il));
 
-	
 	gtl::list<S1> s1l;
 	s1l.push_back({ 1, "a" });
 	s1l.push_back({ 2, "b" });
 	s1l.push_back({ 3, "c" });
-	for (gtl::list<S1>::iterator it = s1l.begin(); it != s1l.end(); ++it)
-	{
-		std::cout << it->a << ", " << it->b.c_str() << std::endl;
-	}
-	for (gtl::list<S1>::reverse_iterator it = s1l.rbegin(); it != s1l.rend(); ++it)
-	{
-		std::cout << it->a << ", " << it->b.c_str() << std::endl;
-	}
-
+	print(s1l.begin(), s1l.end());
+	print(s1l.rbegin(), s1l.rend());
 
 	std::cout << "before delete il" << std::endl;
 	delete il;
