@@ -1,17 +1,16 @@
 #include <map.hpp>
 
-#include <map>
-#include <string>
+#include <string.hpp>
 
 int main(void)
 {
-	gtl::map<std::string, std::string> m;
+	gtl::map<gtl::string, gtl::string> m;
 
 	m["abc"] = "def";
 	m["123"] = "456";
 	m["asdfasdfaf"] = "def";
 
-	for (gtl::map<std::string, std::string>::iterator itr = m.begin(); itr != m.end(); ++itr)
+	for (gtl::map<gtl::string, gtl::string>::iterator itr = m.begin(); itr != m.end(); ++itr)
 	{
 		std::cout << itr->first << " : " <<  itr->second << std::endl;
 	}

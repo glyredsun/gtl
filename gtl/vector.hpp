@@ -88,7 +88,7 @@ public:
 	vector& operator=(vector&& other)
 	{
 		if (this != &other) {
-			moveFrom(other);
+			moveFrom(gtl::move(other));
 		}
 		return *this;
 	}

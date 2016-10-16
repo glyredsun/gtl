@@ -51,4 +51,10 @@ std::basic_ostream<CharType>& operator << (std::basic_ostream<CharType>& o, cons
 	return o.write(s.begin(), s.size());
 }
 
+template <class CharType, class BaseType>
+bool operator < (const basic_string<CharType, BaseType>& left, const basic_string<CharType, BaseType>& right)
+{
+	return strncmp(left.data(), right.data(), left.size() < right.size() ? left.size() : right.size()) < 0;
+}
+
 GTL_END_NS
