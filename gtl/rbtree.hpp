@@ -163,23 +163,33 @@ protected:
 			}
 
 			if (less(elem, t->elem)) {
-				ret = insert(gtl::move(elem), t->left, less);
+				if (t->left)
+					ret = insert(gtl::move(elem), t->left, less);
+				else {
+					t->left = new Node(gtl::move(elem), t);
+					ret = t->left;
+				}
 			}
 			else if (less(t->elem, elem)) {
-				ret = insert(gtl::move(elem), t->right, less);
+				if (t->right)
+					ret = insert(gtl::move(elem), t->right, less);
+				else {
+					t->right = new Node(gtl::move(elem), t);
+					ret = t->right;
+				}
 			}
 			else {
 				ret = t;
 			}
+
+			if (isRed(t->right)) {
+				rotateLeft(t);
+			}
+
+			if (isRed(t->left) && isRed(t->left->left)) {
+				rotateRight(t);
+			}
 		} 
-
-		if (isRed(t->right)) {
-			t = rotateLeft(t);
-		}
-
-		if (isRed(t->left) && isRed(t->left->left)) {
-			t = rotateRight(t);
-		}
 
 		return ret;
 	}

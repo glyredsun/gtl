@@ -7,11 +7,13 @@
 
 #include <macros.hpp>
 #include <avltree.hpp>
+#include <rbtree.hpp>
 #include <utility.hpp>
 
 NS_BEGIN(gtl);
 
 template <class K, class V, class BaseType = avltree<gtl::pair<K, V>>>
+//template <class K, class V, class BaseType = rbtree<gtl::pair<K, V>>>
 class map : public BaseType
 {
 public:
@@ -19,7 +21,7 @@ public:
 
 public:
 
-	map() : avltree<value_type>(value_less)
+	map() : BaseType(value_less)
 	{
 
 	}

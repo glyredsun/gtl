@@ -251,6 +251,11 @@ public:
 		return where;
 	}
 
+	pointer data() const
+	{
+		return _start;
+	}
+
 protected:
 
 	void copyFrom(const vector &other)
